@@ -9,7 +9,7 @@ Never put personal details in the repo: no addresses, account numbers, balances,
 
 ## Working with Steve
 
-- Steve doesn't read code. Describe changes in plain language: what he'll see and do, not how
+- Steve doesn't want to read code. Describe changes in plain language: what he'll see and do, not how
   it's built. Don't paste code into replies.
 - Ask clarifying questions in plain text, never as pop-up multiple-choice dialogs.
 - He uses an iPhone (Safari, and apps saved to the home screen as web apps) and a Mac (desktop browser). Mobile-first, but
