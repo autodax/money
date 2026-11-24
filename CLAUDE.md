@@ -20,6 +20,8 @@ Never put personal details in the repo: no addresses, account numbers, balances,
 
 ## Project notes
 
+Other assistants start from `AGENTS.md`. Keep it and `tests/` current too.
+
 @notes/retirement.md
 
 ## Every change

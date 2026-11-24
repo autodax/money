@@ -17,6 +17,10 @@ These notes were started from a quick read of the files; expand them as you work
 - `index.html`: an older copy of the 2026 tax estimator (a few labels differ from tax2026.html).
 - `roth.html`, `wizard.html`: small pages that forward to the 2026 versions.
 
+## Tests
+
+- `tests/` holds the checks (see `AGENTS.md` for how to run them). They use made-up numbers only; never paste real balances or pay into them.
+
 ## How the files are organized
 
 - Each big file has a "how this file is organized" comment near the top of its script.
