@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What to Withdraw This Year</title>
+<style>
+:root{--bg:#f3ede4;--card:#faf6ef;--tx:#3d342b;--mut:#8a7d6e;--ac:#a9673f;--bd:#e0d5c4;--bad:#a8473a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1e1a17;--card:#26211e;--tx:#d6cdc2;--mut:#968a7e;--ac:#b8977a;--bd:#38322c;--bad:#c2877c}}
+:root[data-theme="dark"]{--bg:#1e1a17;--card:#26211e;--tx:#d6cdc2;--mut:#968a7e;--ac:#b8977a;--bd:#38322c;--bad:#c2877c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+@media(min-width:700px){body{zoom:1.25}}
+.w{max-width:560px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.4rem;margin:0}.sub{color:var(--mut);margin:2px 0 14px}
+.bar{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}.bar div{display:flex;gap:8px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-top:14px}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-size:.78rem;color:var(--mut)}
+input,select{width:100%;box-sizing:border-box;margin-top:3px;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+button{font:inherit;font-size:.85rem;padding:7px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
+button:hover{border-color:var(--ac)}
+h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:14px 0 8px}h2:first-child{margin-top:0}
+.big{font-size:2.3rem;font-weight:700;color:var(--ac);line-height:1.2}
+ol{margin:6px 0 0;padding-left:20px}li{margin:4px 0}
+a{color:var(--ac)}
+.f3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+input,select{font-size:1rem;font-weight:500;padding:5px 8px}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.nw{position:relative;margin-top:3px}.nw input{margin-top:0;padding-right:32px}
+.nw .st{position:absolute;right:3px;width:32px;padding:0;border:0;border-radius:6px;background:transparent;color:var(--mut);font-size:.7rem;line-height:1;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;cursor:pointer}
+.nw .st:hover{color:var(--ac);background:var(--card)}
+.nw .up{top:3px;bottom:50%}.nw .dn{top:50%;bottom:3px}
+details{margin-top:14px}details.c p,details.c li{font-size:.9rem}summary{cursor:pointer;color:var(--mut);font-size:.85rem}
+.n{font-size:.92rem;line-height:1.55;color:var(--mut);margin-top:14px}.warn{color:var(--bad);font-weight:600}
+</style><script>
+var wcManual=null;
+function wcTime(){var h=new Date().getHours();return(h>=19||h<7)?"dark":"light"}
+function wcApply(){var t=wcManual||wcTime();if(document.documentElement.getAttribute("data-theme")!==t){document.documentElement.setAttribute("data-theme",t);if(window.wcLabel)wcLabel()}}
+wcApply();setInterval(wcApply,30000);document.addEventListener("visibilitychange",wcApply);
+</script></head><body><div class="w">
+<div class="bar"><h1>What to withdraw this year</h1><div><button id="theme" type="button"></button><button id="copy" type="button">Copy link</button></div></div>
+<p class="sub">Risk-based guardrails, including Social Security.</p>
+<div class="c">
+<div class="f" style="grid-template-columns:1fr;margin-bottom:10px"><label>Method<select id="method"><option value="mc">Risk-based: simulated returns</option><option value="bt">Risk-based: historical backtest</option></select></label><label class="rb mc">Return assumptions<select id="src"><option value="van">Vanguard forecast (June 2026)</option><option value="his">Historical averages (1871 to 2022)</option></select></label><label class="rb">Portfolio mix (stocks / bonds)<select id="mix"><option value="100">100 / 0</option><option value="90" selected>90 / 10</option><option value="80">80 / 20</option><option value="70">70 / 30</option><option value="60">60 / 40</option><option value="50">50 / 50</option><option value="40">40 / 60</option><option value="30">30 / 70</option><option value="20">20 / 80</option><option value="custom">Custom</option></select><span class="mc" id="asof" data-d="block" style="display:block;margin-top:3px;font-size:.72rem;opacity:.85">Vanguard figures as of June 30, 2026</span></label></div>
+<div class="f">
+<label>Your age now<input id="age" type="number" placeholder="e.g. 61" value=""></label>
+<label>Plan to age<input id="end" type="number" value="93"></label>
+<label>Portfolio balance now ($)<input id="bal" type="number" step="500" placeholder="e.g. 2,000,000" value=""></label>
+<label>Inflation rate (%)<input id="inf" type="number" step="0.1" value="3"></label>
+<label style="grid-column:1/-1">Social Security claiming age and monthly benefit (amounts are editable in Advanced settings)<select id="ssPick"></select></label>
+</div>
+<h2>From your records</h2>
+<div class="f">
+<label>Amount you took from the portfolio last year ($) <span class="rb" id="lwHint" style="opacity:.8">(optional: leave blank for an 85% chance of success)</span><input id="lastW" type="number" step="500" value=""></label>
+</div>
+<details><summary>Advanced settings</summary><div class="f" style="margin-top:10px">
+<label class="rb mc">Expected return (%/yr, annualized)<input id="mean" type="number" step="0.1" value="5.16"></label>
+<label class="rb mc">Volatility (% std. dev.)<input id="vol" type="number" step="0.1" value="13.7"></label>
+<label class="rb">Target chance of success (%)<input id="tgt" type="number" value="85"></label>
+<label class="rb">Cut if chance falls below (%)<input id="lowP" type="number" value="72"></label>
+<label class="rb">Raise if chance rises above (%)<input id="upP" type="number" value="95"></label>
+<div class="rb mc" style="grid-column:1/-1;font-size:.8rem;color:var(--mut)">Where to look up expected returns and volatility: <a href="https://corporate.vanguard.com/content/corporatesite/us/en/corp/vemo/vemo-return-forecasts.html" target="_blank" rel="noopener">Vanguard</a> · <a href="https://www.blackrock.com/institutions/en-us/insights/charts/capital-market-assumptions" target="_blank" rel="noopener">BlackRock</a> · <a href="https://www.capitalgroup.com/offshore/en/investments/capabilities/capital-market-assumptions.html" target="_blank" rel="noopener">Capital Group</a>. Forecasts differ by firm and are updated about quarterly. Type your choice into the boxes above.</div>
+<div style="grid-column:1/-1"><div style="font-size:.78rem;color:var(--mut);margin-bottom:4px">Social Security monthly estimates from your statement ($ in today's dollars). They fill the dropdown above. Leave an age blank to remove it.</div><div class="f3"><label>Age 62<input id="ss62" type="number" value="2316"></label><label>Age 63<input id="ss63" type="number" value="2513"></label><label>Age 64<input id="ss64" type="number" value="2729"></label><label>Age 65<input id="ss65" type="number" value="3008"></label><label>Age 66<input id="ss66" type="number" value="3294"></label><label>Age 67<input id="ss67" type="number" value="3587"></label><label>Age 68<input id="ss68" type="number" value="3692"></label><label>Age 69<input id="ss69" type="number" value="4043"></label><label>Age 70<input id="ss70" type="number" value="4648"></label></div></div>
+<label class="bt" data-d="" style="display:none;grid-column:1/-1">When the history runs out<select id="wrap"><option value="1">Wrap around to 1871 (every year is a start year)</option><option value="0">Stop at 2022 (fewer start years)</option></select></label>
+<div class="bt" data-d="block" style="display:none;grid-column:1/-1;font-size:.8rem;color:var(--mut)">Historical mode replays real (inflation-adjusted) US stock and bond returns from 1871 to 2022 (S&amp;P 500 with dividends and 10-year Treasuries, built from Robert Shiller's data), rebalanced yearly to your mix. The return, volatility and inflation-forecast boxes do not apply. A Custom mix uses 90 / 10.</div>
+</div></details>
+</div>
+<div class="c" id="out"></div>
+
+<details class="c rb" open><summary style="font-size:.95rem;color:var(--tx);font-weight:600">The idea behind risk-based guardrails</summary>
+<p>Instead of watching a withdrawal rate, this method asks a direct question each year: <b>if I keep spending this much (plus inflation), what are the chances my money lasts to my plan-to age?</b> It answers by running thousands of simulated futures with random market returns.</p>
+<ul style="padding-left:20px;margin:6px 0">
+<li>If the chance is inside your comfort band (say 72% to 95%), you change nothing.</li>
+<li>If it drops below the lower guardrail, spending is held at the most you can take while staying at that guardrail.</li>
+<li>If it rises above the upper guardrail, spending is raised to the amount that puts you at that guardrail. Your target chance (say 85%) is the answer shown when you leave last year's withdrawal blank.</li></ul>
+<p>The upside is that it uses your actual age, balance, and Social Security timing, so longevity is built in. The return and volatility boxes fill in automatically from your stock/bond mix, using a saved snapshot of Vanguard's Capital Markets Model run of June 30, 2026: the midpoints of its 10-year return ranges (US stocks 4.2% to 6.2%, so 5.2%; US aggregate bonds 4.3% to 5.3%, so 4.8%) and its median volatility (stocks 15.1%, bonds 6.2%). The 0.1 stock-bond correlation is my own assumption, not a Vanguard figure. It is a snapshot, not a live feed. The downside is that it depends on those assumptions, and a large drop in your balance can call for a large cut. It is an estimate, not a guarantee.</p></details>
+<details class="c bt" style="display:none" open><summary style="font-size:.95rem;color:var(--tx);font-weight:600">How the historical backtest works</summary>
+<p>Instead of random simulations, this replays what actually happened. For every possible retirement start year from 1871 on, it applies the real stock and bond returns of the next several decades (up to your plan-to age) to your balance and spending, and counts how many of those retirements would have lasted. That share is your chance of success, and the guardrails work the same way as before.</p>
+<p>It is the approach FI Calc uses, on the same Shiller data. Its strengths are real market history, with real crashes and inflation, and no forecast to guess. Its limits: the history is US-only and includes the 20th century's unusually strong results, the periods overlap heavily so there are really only a handful of independent retirements, and it can't condition on today's high valuations. If you choose to wrap around, late start years continue with the oldest data (after 2022 comes 1871), which is artificial because those markets are unconnected, so treat those windows with some caution.</p></details>
+<p class="n">About last year's withdrawal: it is optional. If you enter it, it works as a test. When last year's amount plus inflation still gives a chance of success inside your comfort band, that is your answer. Outside the band, spending is held at the nearest edge of the band, so the answer changes smoothly and in one direction as last year's amount changes. Leave it blank to see the amount that hits your target chance. Use the amount taken from the portfolio only (not Social Security), before tax, and next year enter this year's result. Enter Social Security in today's dollars; it is applied to your spending first so your portfolio covers the rest. This is an estimate, not financial advice.</p>
+</div>
+<script>
+const $=id=>document.getElementById(id),v=id=>parseFloat($(id).value)||0;
+const $f=n=>"$"+Math.round(n).toLocaleString();
+function run(){
+  const age=v("age"),B=v("bal"),inf=v("inf")/100,lastW=v("lastW"),ssA=+$("ssPick").value,ss=(SS[ssA]||0)*12,end=v("end");
+  const o=$("out");
+  $("lwHint").textContent="(optional: leave blank for a "+v("tgt")+"% chance of success)";
+  const btm=$("method").value==="bt";
+  document.querySelectorAll(".mc").forEach(e=>e.style.display=btm?"none":(e.dataset.d||""));
+  document.querySelectorAll(".bt").forEach(e=>e.style.display=btm?(e.dataset.d||""):"none");
+  if(B<=0||age<=0)o.innerHTML='<span style="color:var(--mut)">Enter your age and portfolio balance to see a result.</span>';
+  else runRB({age,B,inf,ss,ssA,lastW,end,blank:$("lastW").value.trim()==="",bt:$("method").value==="bt"},o);
+}
+let zc={n:0,z:null};
+function zs(n){ // fixed random normals so results are repeatable
+  if(zc.n===n)return zc.z;let t=12345;const r=()=>{t|=0;t=t+0x6D2B79F5|0;let x=Math.imul(t^t>>>15,1|t);x=x+Math.imul(x^x>>>7,61|x)^x;return((x^x>>>14)>>>0)/4294967296};
+  const z=[];for(let i=0;i<2000*n;i+=1){const u=r()||1e-9,w=r();z.push(Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*w))}
+  zc={n,z};return z;
+}
+const HIST=[[1871,0.1391,0.0346],[1872,0.0874,0.0151],[1873,0.0203,0.1125],[1874,0.1254,0.164],[1875,0.1176,0.1515],[1876,-0.1488,0.0474],[1877,0.1694,0.2476],[1878,0.2959,0.173],[1879,0.2384,-0.1239],[1880,0.3435,0.1287],[1881,-0.0718,-0.0348],[1882,0.0558,0.0551],[1883,0.023,0.1224],[1884,-0.0232,0.1636],[1885,0.3461,0.0847],[1886,0.1194,0.0223],[1887,-0.0514,-0.0226],[1888,0.082,0.1036],[1889,0.1241,0.0886],[1890,-0.0844,-0.0058],[1891,0.2651,0.1043],[1892,-0.015,-0.0492],[1893,-0.0635,0.2009],[1894,0.0797,0.1003],[1895,0.0354,0.0102],[1896,0.0625,0.0822],[1897,0.1694,0.0082],[1898,0.2743,0.0373],[1899,-0.1128,-0.1211],[1900,0.2393,0.0609],[1901,0.1659,0.0002],[1902,-0.0121,-0.0672],[1903,-0.1328,0.0724],[1904,0.2914,0.0049],[1905,0.2131,0.0386],[1906,-0.0362,-0.0274],[1907,-0.2252,0.0442],[1908,0.3506,0.0142],[1909,0.0492,-0.0731],[1910,0.0363,0.1089],[1911,0.0465,0.0489],[1912,-0.0015,-0.0609],[1913,-0.0664,0.0446],[1914,-0.0641,0.0255],[1915,0.2743,0.026],[1916,-0.0379,-0.0869],[1917,-0.3192,-0.1495],[1918,0.0018,-0.1084],[1919,0.0227,-0.1352],[1920,-0.1262,0.0576],[1921,0.2376,0.2466],[1922,0.299,0.0448],[1923,0.0241,0.035],[1924,0.2712,0.0556],[1925,0.2165,0.0169],[1926,0.1411,0.0872],[1927,0.3875,0.0461],[1928,0.4935,0.0247],[1929,-0.0943,0.0598],[1930,-0.169,0.1067],[1931,-0.3803,0.1205],[1932,0.0402,0.1808],[1933,0.531,0.024],[1934,-0.1071,0.0261],[1935,0.5271,0.0239],[1936,0.2989,0.0023],[1937,-0.3256,0.029],[1938,0.1895,0.0565],[1939,0.038,0.0432],[1940,-0.1017,0.0286],[1941,-0.1834,-0.121],[1942,0.1297,-0.0489],[1943,0.2007,-0.0055],[1944,0.17,0.0104],[1945,0.363,0.0154],[1946,-0.2553,-0.139],[1947,-0.0689,-0.0862],[1948,0.082,0.0219],[1949,0.2011,0.044],[1950,0.2451,-0.0717],[1951,0.1683,-0.0252],[1952,0.1426,0.0112],[1953,0.0188,0.0444],[1954,0.4793,0.0221],[1955,0.2846,-0.0003],[1956,0.0378,-0.0423],[1957,-0.0909,0.0261],[1958,0.3844,-0.0515],[1959,0.0655,-0.0203],[1960,0.0476,0.0944],[1961,0.183,0.0138],[1962,-0.0386,0.0456],[1963,0.1927,-0.0032],[1964,0.1489,0.0302],[1965,0.0952,-0.0076],[1966,-0.0953,0.0132],[1967,0.1204,-0.0546],[1968,0.0597,-0.0223],[1969,-0.1387,-0.1052],[1970,0.0214,0.1228],[1971,0.1039,0.0479],[1972,0.1372,-0.0106],[1973,-0.2346,-0.0584],[1974,-0.2939,-0.0721],[1975,0.3044,-0.0069],[1976,0.0573,0.0565],[1977,-0.1482,-0.0404],[1978,0.064,-0.0744],[1979,0.0286,-0.1255],[1980,0.1273,-0.0917],[1981,-0.1438,-0.0517],[1982,0.2548,0.3301],[1983,0.1554,-0.0025],[1984,0.0426,0.0939],[1985,0.2168,0.1975],[1986,0.2952,0.2112],[1987,-0.0617,-0.0637],[1988,0.127,0.0143],[1989,0.1693,0.0888],[1990,-0.0613,0.0313],[1991,0.2861,0.1207],[1992,0.0434,0.0641],[1993,0.0896,0.0968],[1994,-0.016,-0.0958],[1995,0.3174,0.1924],[1996,0.2362,-0.0346],[1997,0.2594,0.1204],[1998,0.2935,0.0961],[1999,0.125,-0.1055],[2000,-0.0862,0.1303],[2001,-0.1445,0.0481],[2002,-0.2215,0.0954],[2003,0.2615,0.0136],[2004,0.03,0.0065],[2005,0.0592,-0.0118],[2006,0.1109,-0.001],[2007,-0.0547,0.0782],[2008,-0.3565,0.1342],[2009,0.2984,-0.0898],[2010,0.1452,0.0463],[2011,0.0047,0.1173],[2012,0.144,0.0085],[2013,0.2365,-0.0701],[2014,0.1358,0.11],[2015,-0.0475,-0.0118],[2016,0.1816,-0.0305],[2017,0.2246,-0.0082],[2018,-0.062,0.0],[2019,0.2504,0.0787],[2020,0.1624,0.0608],[2021,0.1371,-0.1118],[2022,-0.1731,-0.1701]];
+const rng=a=>{const o=[];let i=0;while(i<a.length){let j=i;while(j+1<a.length&&a[j+1]===a[j]+1)j++;o.push(j>i?a[i]+"\u2013"+a[j]:""+a[i]);i=j+1}return o.join(", ")};
+function runRB(q,o){
+  const yrs=q.end-q.age;if(yrs<1){o.innerHTML='<span class="warn">Plan-to age must be above your age.</span>';return}
+  const bt=q.bt,tg=v("tgt")/100,lo=v("lowP")/100,up=v("upP")/100;let N,G,srcTxt;
+  if(bt){const w=(+$("mix").value||90)/100,RET=HIST.map(r=>1+w*r[1]+(1-w)*r[2]);const wrap=$("wrap").value==="1";N=wrap?HIST.length:HIST.length-yrs+1;
+    if(N<1){o.innerHTML='<span class="warn">Your plan runs longer than the '+HIST.length+' years of history available. Shorten the plan-to age or use simulated returns.</span>';return}
+    G=(n,y)=>RET[(n+y)%RET.length];srcTxt=`${N} historical retirement start years (${HIST[0][0]} to ${HIST[N-1][0]}, each followed for ${yrs} years of real US stock and bond returns, rebalanced yearly${wrap&&HIST.length-yrs+1<N?", looping back to "+HIST[0][0]+" after "+HIST[HIST.length-1][0]+" for the later start years":""})`}
+  else{const m=v("mean")/100,sd=v("vol")/100,z=zs(yrs);N=2000;
+    const xx=(1+Math.sqrt(1+4*sd*sd/((1+m)*(1+m))))/2,sg=Math.sqrt(Math.log(xx)),mu=Math.log(1+m);
+    const R=z.map(x=>Math.exp(mu+sg*x)/(1+q.inf));G=(n,y)=>R[n*yrs+y];
+    srcTxt=`${N.toLocaleString()} simulated market futures (${v("mean")}% expected return, ${v("vol")}% volatility)`}
+  const ssAt=a=>a>=q.ssA?q.ss:0,ssNow=ssAt(q.age),ssPrev=q.age-1>=q.ssA?q.ss/(1+q.inf):0;
+  const prob=W=>{const T=W+ssNow;let ok=0;
+    for(let n=0;n<N;n++){let B=q.B,good=true;
+      for(let y=0;y<yrs;y++){const d=Math.max(0,T-ssAt(q.age+y));if(d>B){good=false;break}B=(B-d)*G(n,y)}
+      if(good)ok++}
+    return ok/N};
+  const failYears=W=>{const T=W+ssNow,f=[];for(let n=0;n<N;n++){let B=q.B,good=true;for(let y=0;y<yrs;y++){const d=Math.max(0,T-ssAt(q.age+y));if(d>B){good=false;break}B=(B-d)*G(n,y)}if(!good)f.push(HIST[n][0])}return f};
+  const failLi=W=>bt?`<li>Start years that would have run out: ${(f=>f.length?rng(f):"none")(failYears(W))}.</li>`:"";
+  const solve=p=>{if(prob(0)<p)return 0;let a=0,b=q.B;if(prob(b)>=p)return b;for(let i=0;i<28;i++){const c=(a+b)/2;prob(c)>=p?a=c:b=c}return a};
+  const Wt=solve(tg);
+  if(q.blank){const Wc=solve(lo),Wr=solve(up);
+    o.innerHTML=`<div style="color:var(--mut);font-size:.85rem">Portfolio withdrawal that gives your ${(tg*100).toFixed(0)}% target chance</div>
+<div class="big">${$f(Wt)}</div>
+<div>about <b>${$f(Wt/12)}</b> a month, before tax${ssNow?`. With Social Security, total income is about <b>${$f(Wt+ssNow)}</b> a year.`:"."}</div>
+<h2 style="margin-top:16px">How it was figured</h2><ol>
+<li>Across ${srcTxt}, this is the yearly amount, adjusted for inflation, that lasts to age ${q.end} in about <b>${(prob(Wt)*100).toFixed(0)}%</b> of them.</li>
+${failLi(Wt)}<li>Because you left last year's withdrawal blank, there is no guardrail check. This is simply the amount that matches your target, and it will move whenever your balance or assumptions move.</li></ol>
+<h2 style="margin-top:16px">How to use it</h2><ol>
+<li>If your planned spending from the portfolio this year (last year's amount plus inflation) is above about <b>${$f(Wc)}</b>, your chance of success is below your ${(lo*100).toFixed(0)}% guardrail, so a cut would be advised.</li>
+<li>If it is below about <b>${$f(Wr)}</b>, your chance is above ${(up*100).toFixed(0)}% and you have room to raise spending.</li>
+<li>In between, you can leave spending alone. Enter last year's withdrawal above to get that check.</li></ol>`;return}
+  const Tlast=q.lastW+ssPrev,W0=Math.max(0,Tlast*(1+q.inf)-ssNow),P0=prob(W0);
+  const Wcut=solve(lo),Wraise=solve(up);
+  const W=Math.min(Math.max(W0,Wraise),Wcut);let res;
+  if(W0>Wcut)res=`That is below your lower guardrail (${(lo*100).toFixed(0)}%), so spending is held at <b>${$f(Wcut)}</b>, the most you can take while staying at that guardrail.`;
+  else if(W0<Wraise)res=`That is above your upper guardrail (${(up*100).toFixed(0)}%), so spending is raised to <b>${$f(Wraise)}</b>, the amount that puts you at that guardrail.`;
+  else res=`That is inside your ${(lo*100).toFixed(0)}% to ${(up*100).toFixed(0)}% comfort band, so no change.`;
+  const P1=prob(W);
+  o.innerHTML=`<div style="color:var(--mut);font-size:.85rem">Take from your portfolio this year</div>
+<div class="big">${$f(W)}</div>
+<div>about <b>${$f(W/12)}</b> a month, before tax${ssNow?`. With Social Security, total income is about <b>${$f(W+ssNow)}</b> a year.`:"."}</div>
+<h2 style="margin-top:16px">How it was figured</h2><ol>
+<li>Last year's spending: ${$f(q.lastW)} from the portfolio${ssPrev?` plus ${$f(ssPrev)} Social Security`:""} = <b>${$f(Tlast)}</b>. With ${(q.inf*100).toFixed(1)}% inflation, the portfolio would need to supply <b>${$f(W0)}</b> this year.</li>
+<li>Across ${srcTxt}, that spending, adjusted for inflation each year, lasts to age ${q.end} in <b>${(P0*100).toFixed(0)}%</b> of them.</li>
+<li>${res}</li>
+${W!==W0?`<li>The new amount of ${$f(W)} gives about a <b>${(P1*100).toFixed(0)}%</b> chance of lasting.</li>`:""}${failLi(W)}</ol>
+<h2 style="margin-top:16px">What would change this answer</h2><ol>
+<li>Your withdrawal follows last year's amount plus inflation, but is kept between <b>${$f(Wraise)}</b> (the ${(up*100).toFixed(0)}% chance level) and <b>${$f(Wcut)}</b> (the ${(lo*100).toFixed(0)}% chance level) at today's balance and assumptions.</li>
+<li><b>Last year's amount:</b> if it is between about <b>${$f((Wraise+ssNow)/(1+q.inf)-ssPrev)}</b> and <b>${$f((Wcut+ssNow)/(1+q.inf)-ssPrev)}</b>, the recommendation is simply that amount plus inflation. Above that range it stays at ${$f(Wcut)}; below it, it stays at ${$f(Wraise)}. It never moves in the opposite direction as last year's amount changes.</li>
+<li>A larger balance, a shorter horizon, or higher assumed returns move that range up; a smaller balance or a longer horizon moves it down.</li></ol>
+<div style="color:var(--mut);font-size:.8rem;margin-top:8px">Next year, enter ${$f(W)} as the amount you took last year. ${bt?"Backtests use past US market history, which may not repeat, and the overlapping periods are not independent.":"Simulations are estimates and depend on your return and volatility assumptions."}</div>`;
+}
+
+const MIX={s:{r:5.2,v:15.1},b:{r:4.8,v:6.2},rho:0.1};
+function applyMix(){const p=$("mix").value;if(p==="custom")return;const w=+p/100,b=1-w,his=$("src").value==="his";
+  $("asof").textContent=his?"Historical averages, 1871 to 2022 (US)":"Vanguard figures as of June 30, 2026";
+  if(his){const rr=HIST.map(x=>w*x[1]+b*x[2]),n=rr.length,mu=rr.reduce((a,c)=>a+c,0)/n,sd=Math.sqrt(rr.reduce((a,c)=>a+(c-mu)**2,0)/n),geo=Math.exp(rr.reduce((a,c)=>a+Math.log(1+c),0)/n)-1,infl=v("inf")/100;
+    $("mean").value=(((1+geo)*(1+infl)-1)*100).toFixed(2);$("vol").value=(sd*(1+infl)*100).toFixed(1);return}
+  const r=w*MIX.s.r+b*MIX.b.r,vr=w*w*MIX.s.v**2+b*b*MIX.b.v**2+2*MIX.rho*w*b*MIX.s.v*MIX.b.v;
+  $("mean").value=r.toFixed(2);$("vol").value=Math.sqrt(vr).toFixed(1)}
+$("mix").addEventListener("input",applyMix);
+$("src").addEventListener("input",applyMix);
+$("inf").addEventListener("input",()=>{if($("src").value==="his")applyMix()});
+const AGES=[62,63,64,65,66,67,68,69,70],DEFAMT=[2316,2513,2729,3008,3294,3587,3692,4043,4648];
+let SS={},avail=[];
+function rebuildSS(){const cur=$("ssPick").value;SS={};AGES.forEach(a=>{const x=parseFloat($("ss"+a).value);if(x>0)SS[a]=x});
+  avail=AGES.filter(a=>SS[a]);if(!avail.length)avail=[0];
+  $("ssPick").innerHTML=avail.map(a=>a?`<option value="${a}">Age ${a}: $${Math.round(SS[a]).toLocaleString()} / month</option>`:`<option value="0">No Social Security entered</option>`).join("");
+  $("ssPick").value=avail.includes(+cur)?cur:(avail.includes(70)?"70":String(avail[avail.length-1]))}
+AGES.forEach(a=>$("ss"+a).addEventListener("input",rebuildSS));
+["mean","vol"].forEach(id=>$(id).addEventListener("input",()=>{$("mix").value="custom"}));
+document.querySelectorAll('input[type=number]').forEach(inp=>{
+  const w=document.createElement('div');w.className='nw';inp.parentNode.insertBefore(w,inp);w.appendChild(inp);
+  [['up','\u25B2',1,'Increase'],['dn','\u25BC',-1,'Decrease']].forEach(([c,t,d,l])=>{
+    const b=document.createElement('button');b.type='button';b.className='st '+c;b.textContent=t;b.tabIndex=-1;b.setAttribute('aria-label',l);
+    b.addEventListener('click',e=>{e.preventDefault();d>0?inp.stepUp():inp.stepDown();inp.dispatchEvent(new Event('input',{bubbles:true}))});
+    w.appendChild(b)})});
+document.querySelectorAll("input,select").forEach(e=>e.addEventListener("input",run));
+const DEF={method:"mc",src:"van",wrap:"1",mix:"90",ssPick:"70"};
+const BASE=["age","bal","inf","lastW","end","ssPick","method","mix","tgt","lowP","upP"];
+function urlKeys(){return $("method").value==="bt"?[...BASE,"wrap"]:[...BASE,"src",...($("mix").value==="custom"?["mean","vol"]:[])]}
+const q=new URLSearchParams(location.hash.slice(1));
+if(q.has("ssAmts"))q.get("ssAmts").split(",").forEach((x,i)=>{if(AGES[i])$("ss"+AGES[i]).value=x});
+rebuildSS();
+[...BASE,"wrap","src","mean","vol"].forEach(k=>{if(q.has(k))$(k).value=q.get(k)});
+for(const k in DEF)if(!$(k).value)$(k).value=DEF[k];
+if(!avail.includes(+$("ssPick").value))$("ssPick").value=avail.includes(70)?"70":String(avail[avail.length-1]);
+applyMix();
+run();
+const root=document.documentElement,tb=$("theme");
+function label(){tb.textContent=root.getAttribute("data-theme")==="dark"?"☀ Light mode":"🌙 Dark mode"}
+window.wcLabel=label;wcApply();label();
+tb.onclick=()=>{wcManual=root.getAttribute("data-theme")==="dark"?"light":"dark";wcApply();label()};
+function buildUrl(){const u=new URL(location.href);u.search="";const hp=new URLSearchParams();
+  urlKeys().forEach(k=>hp.set(k,$(k).value));
+  const am=AGES.map(a=>$("ss"+a).value).join(",");if(am!==DEFAMT.join(","))hp.set("ssAmts",am);
+  u.hash=hp.toString();return u.toString()}
+$("copy").onclick=async()=>{
+  const url=buildUrl();let ok=false;
+  try{history.replaceState(null,"",url)}catch(e){}
+  try{await navigator.clipboard.writeText(url);ok=true}catch(e){
+    try{const t=document.createElement("textarea");t.value=url;t.style.cssText="position:fixed;opacity:0";document.body.appendChild(t);t.select();ok=document.execCommand("copy");t.remove()}catch(e2){}}
+  const b=$("copy");b.textContent=ok?"Copied ✓":"Copy failed";if(!ok)prompt("Copy this link:",url);
+  setTimeout(()=>b.textContent="Copy link",1800);
+};
+</script></body></html>
