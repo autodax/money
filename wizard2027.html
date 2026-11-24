@@ -934,7 +934,7 @@ function render(R){
     else if(I.down)R.more.down=`The market is down more than 5%, but ${room.replace(/^My/,'my').replace(/^This/,'this').replace(/^The top/,'the top')}`}
   // Link to the tax estimator for next year's figures (next year's file when it exists)
   const taxNext=()=>{const p=R.NC.tp,ny=I.yr+1,file=`tax${Math.min(ny,2028)}.html`,o={wages:Math.round(p.wages),wrate:Math.ceil(p.wh+R.E),wtype:'amt',npay:I.npay<26?I.npay:'',ira:Math.round(p.ira),ssa:Math.round(p.ssa),ndiv:Math.round(p.ndiv),qdiv:Math.round(p.qdiv),stcg:0,ltcgPlan:Math.round(p.ltcgPlan),ltcg:Math.ceil(p.ltcg),magi2yr:p.o65?Math.round(I.lagi||0):0,age:p.o65?'over65':'under65',solveBasis:I.bp*100,bracketSel:I.tbrk,rateSel:Math.min(22,Math.max(15,Math.round(I.teff)))};
-    return{url:'https://autodax.github.io/'+file+'#'+Object.entries(o).filter(([k,v])=>v!==''&&v!=null&&!Number.isNaN(v)).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&'),yr:file.slice(3,7),ny}};
+    return{url:'https://autodax.github.io/money/'+file+'#'+Object.entries(o).filter(([k,v])=>v!==''&&v!=null&&!Number.isNaN(v)).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&'),yr:file.slice(3,7),ny}};
   let todo=[];const KIND=[];const ACT=[];const act=(w,t)=>ACT.push([w,t]);const CAL=[];window._CAL=CAL;const cal=(d,t,x)=>{if(new Date(d+'T23:59:59')>=today)CAL.push([d,t,x||''])};
   // First action of next year's check-in: run next year's Wizard (the link carries over this year's entries)
   act(`${lastNov(I.yr+1).s}, ${I.yr+1}`,`Run the ${I.yr+1} <a class="wznext" href="#">Wizard</a>. It opens with this year's entries already filled in${I.yr+2<=I.lw?`; then set ${I.yr+2} payroll Roth contributions`:''}.`);
@@ -1219,12 +1219,12 @@ function render(R){
   const PCT=new Set(['inf','infl','g','gb','basis','solveBasis','tgt','lowP','upP','mean','vol','tval']);
   const clean=(k,v)=>{const n=typeof v==='number'?v:(typeof v==='string'&&v.trim()!==''&&isFinite(+v)?+v:null);if(n===null)return v;return String(PCT.has(k)?Math.round(n*100)/100:Math.round(n))};
   const q=o=>Object.entries(o).filter(([k,v])=>v!==''&&v!=null).map(([k,v])=>k+'='+encodeURIComponent(clean(k,v))).join('&');
-  const taxL='https://autodax.github.io/tax2027.html#'+q({wages:Math.round(t.w),wrate:Math.ceil(I.wwh+(I.pay==='wh'?R.Wh||0:0)),wtype:'amt',ira:Math.round(t.i),ssa:Math.round(t.ss),ndiv:Math.round(t.it),qdiv:Math.round(t.qd),stcg:Math.round(t.st),ltcgPlan:Math.round(I.ltg),ltcg:Math.ceil(S.g),magi2yr:I.o65?Math.round(I.agi2||0):0,age:I.o65?'over65':'under65',solveBasis:I.bp*100,bracketSel:I.tbrk,rateSel:Math.min(22,Math.max(15,Math.round(I.teff)))});
+  const taxL='https://autodax.github.io/money/tax2027.html#'+q({wages:Math.round(t.w),wrate:Math.ceil(I.wwh+(I.pay==='wh'?R.Wh||0:0)),wtype:'amt',ira:Math.round(t.i),ssa:Math.round(t.ss),ndiv:Math.round(t.it),qdiv:Math.round(t.qd),stcg:Math.round(t.st),ltcgPlan:Math.round(I.ltg),ltcg:Math.ceil(S.g),magi2yr:I.o65?Math.round(I.agi2||0):0,age:I.o65?'over65':'under65',solveBasis:I.bp*100,bracketSel:I.tbrk,rateSel:Math.min(22,Math.max(15,Math.round(I.teff)))});
   const ssAmts=AGES.map(a=>I.T[a]||'').join(','),sp={age:I.age+1,bal:Math.round(I.pre+I.roth+I.brk+I.ef+I.cash),inf:I.inf*100,lastW:I.lspBlank?'':Math.round(R.lastDraw),end:I.end,ssPick:I.ssA,tgt:I.tg*100,lowP:I.lo*100,upP:I.up*100};
   const mx=I.mix%10?Math.floor(I.mix/10)*10:I.mix;R.mixNote=I.mix%10?(I.meth==='bt'?`The withdrawal calculator has no ${I.mix}/${100-I.mix} setting, so its backtest link uses ${mx}/${100-mx}.`:`The withdrawal calculator has no ${I.mix}/${100-I.mix} setting, so its link sends the return and volatility as custom figures.`):'';
   if(I.meth==='bt')Object.assign(sp,{method:'bt',mix:mx,wrap:I.wrap?1:0});else if(I.meth==='cus'||I.mix%10)Object.assign(sp,{method:'mc',mix:'custom',src:'van',mean:I.M.mean,vol:I.M.vol});else Object.assign(sp,{method:'mc',mix:I.mix,src:I.meth});
   if(ssAmts!==DEFAMT.join(','))sp.ssAmts=ssAmts;
-  const spendL='https://autodax.github.io/spend2027.html#'+q(sp);
+  const spendL='https://autodax.github.io/money/spend2027.html#'+q(sp);
   const rp={living:Math.round(P.living),infl:I.inf*100,g:I.g*100,p403:Math.round(num('p403')+num('efp'))||'',p457:Math.round(num('p457'))||'',pira:Math.round(num('pira'))||'',r403:Math.round(num('r403'))||'',r457:Math.round(num('r457'))||'',rira:Math.round(num('rira'))||'',brk:Math.round(I.brk),bas:Math.round(I.bas),div:Math.round(I.div),gb:I.g*100,cash:Math.round(I.cash)||'',cashmin:Math.round(I.cashMin)||'',ef:Math.round(I.ef)||'',efr:I.ef>0?+(I.int/I.ef*100).toFixed(2):'',corder:I.corder==='custom'?((convSort(I.accRows.map(a=>({...a})),'custom')[0]||{}).c||'small'):I.corder,start:I.yr,by:I.by,lw:I.lw,firstc:I.yr,lastc:I.by+I.cmax};
   for(let y=I.yr;y<=I.lw;y++)if(I.WK[y]){rp['w'+y+'a']=I.WK[y][0]||'';rp['w'+y+'b']=I.WK[y][1]||''}
   // The planner runs the same method I picked here, with the same market futures for Auto with guardrails
@@ -1236,7 +1236,7 @@ function render(R){
       // each strategy's own starting point when this year's conversion differs (and the chosen plan's)
       if(R.P&&R.P.C0>0)alt.plan=S(prep(I,R.P.C0));(R.P&&R.P.cands||[]).forEach(c=>{if(c.C0>0)alt[c.k+':'+c.v]=S(prep(I,c.C0))});
       return JSON.stringify({Y0:P0.Y0,Y1:P0.Y1,ssY:r(P0.ssY),cashMin:r(P0.cashMin),yld:+P0.yld.toFixed(6),efR:+P0.efR.toFixed(6),...S(P0),agiM1:r(P0.agiM1),alt})})()});
-  const rothL=`https://autodax.github.io/roth${FILEYEAR}.html#`+q(rp);
+  const rothL=`https://autodax.github.io/money/roth${FILEYEAR}.html#`+q(rp);
   const links=`<div class="links"><a href="${spendL}" target="_blank" rel="noopener">What to Withdraw This Year<span>Same balance, guardrails and returns</span></a><a href="${rothL}" target="_blank" rel="noopener">Roth Conversion Planner<span>Same accounts, wages and strategy</span></a><a href="${taxL}" target="_blank" rel="noopener">2027 Federal Tax Estimator<span>This year's (${I.yr}) income, conversion and withholding</span></a><a href="${taxNext().url}" target="_blank" rel="noopener">${taxNext().yr} Federal Tax Estimator<span>Next year's (${I.yr+1}) estimate${taxNext().yr!=String(I.yr+1)?`, on ${taxNext().yr} rules`:''}</span></a></div>
   ${ssTxt||R.mixNote?`<p class="note">${ssTxt?'The Roth Conversion Planner uses its own built-in Social Security amounts. ':''}${R.mixNote||''}</p>`:''}`;
 
