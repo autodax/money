@@ -2,7 +2,7 @@
 
 This repo is Steve's retirement-planning web apps, live at https://autodax.github.io/money/ (GitHub Pages, public).
 Read this file, then `notes/retirement.md` (what each part does and the decisions Steve has made).
-`CLAUDE.md` holds the same working rules in Claude's format.
+This is the single source of the working rules; `CLAUDE.md` just points here for Claude.
 
 ## Ground rules
 
@@ -12,11 +12,12 @@ Read this file, then `notes/retirement.md` (what each part does and the decision
   For simple choice questions, Steve prefers buttons (multiple-choice dialogs) over plain-text questions; open-ended ones can be plain text.
 - He uses an iPhone (Safari and home-screen web apps) and a Mac. Both must work. The iPhone-only tweaks
   (115% scale, locked viewport) must not change the Mac layout.
+- When a choice is visual (icons, layouts, colors), show a few options side by side before committing to one.
 - Do the work, test it, push it, then say briefly what changed. Tell him what to do to see it:
   Mac: "reload the page". iPhone: "swipe the app away and reopen it".
 - Before pushing: `git fetch` and rebase onto `origin/main` (other assistants push here too). Commit messages in plain
   language, describing what changed for him.
-- Update `notes/retirement.md` in the same commit whenever behavior, a decision or a quirk changes. Record only
+- Update `notes/retirement.md` and, if the rules or tests change, this file and `tests/`, in the same commit whenever behavior, a decision or a quirk changes. Record only
   decisions Steve actually stated as decisions. Remove anything that is no longer true.
 
 ## How the pieces fit
