@@ -11,7 +11,7 @@ Never put personal details in the repo: no addresses, account numbers, balances,
 
 - Steve doesn't want to read code. Describe changes in plain language: what he'll see and do, not how
   it's built. Don't paste code into replies.
-- Ask clarifying questions in plain text, never as pop-up multiple-choice dialogs.
+- Pop-up multiple-choice dialogs are fine when asking clarifying questions.
 - He uses an iPhone (Safari, and apps saved to the home screen as web apps) and a Mac (desktop browser). Mobile-first, but
   everything must also work at desktop widths; the iPhone-only tweaks (115% scale, locked viewport) must not affect the Mac.
 - When a choice is visual, show a few options side by side before committing to one.
