@@ -9,7 +9,7 @@ Read this file, then `notes/retirement.md` (what each part does and the decision
 - **Public repo.** Never put personal details in it: no addresses, account numbers, balances, salary, tokens.
   Test data in `tests/` is made up. Keep it that way.
 - Steve doesn't want to read code. Explain every change in plain language: what he'll see and do. No code in replies.
-  Pop-up multiple-choice dialogs are fine when asking clarifying questions.
+  For simple choice questions, Steve prefers buttons (multiple-choice dialogs) over plain-text questions; open-ended ones can be plain text.
 - He uses an iPhone (Safari and home-screen web apps) and a Mac. Both must work. The iPhone-only tweaks
   (115% scale, locked viewport) must not change the Mac layout.
 - Do the work, test it, push it, then say briefly what changed. Tell him what to do to see it:
