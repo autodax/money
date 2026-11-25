@@ -711,12 +711,12 @@ if(autoTheme() === 'dark') document.documentElement.setAttribute('data-theme', '
       </div>
 
       <div class="field" style="margin-top:8px; padding-top:7px; border-top:1px solid var(--paper-line);">
-        <label for="magi2yr">MAGI from 2025 (IRMAA lookback year)</label>
+        <label for="magi2yr">MAGI from 2026 (IRMAA lookback year)</label>
         <div class="amount-wrap">
           <span class="dollar">$</span>
           <input type="number" id="magi2yr" min="0" step="500" placeholder="0" inputmode="decimal">
         </div>
-        <span class="hint">2025 MAGI (AGI + tax-exempt interest) sets 2028 Medicare premiums — see breakdown at right</span>
+        <span class="hint">2026 MAGI (AGI + tax-exempt interest) sets 2028 Medicare premiums — see breakdown at right</span>
       </div>
     </div>
 
@@ -819,11 +819,11 @@ if(autoTheme() === 'dark') document.documentElement.setAttribute('data-theme', '
         </table>
         <div class="summary-line" style="margin-top:7px;"><span id="srcEmployerLbl">Est. employer FIT on wages<br><small style="font-size:0.66rem;">Single, std. deduction, wages only</small></span><span class="v" id="srcEmployer">$0</span></div>
         <div class="summary-line"><span>Still owed after wage withholding<br><small style="font-size:0.66rem;">Negative = over-withheld</small></span><span class="v" id="srcStillOwed">$0</span></div>
-        <div class="summary-line"><span>Pay in quarterly estimated payments<br><small style="font-size:0.66rem;">One quarter each on Apr 15, Jun 15, Sep 15, 2028 and Jan 15, 2028. Income tax only; IRMAA is paid with Medicare.</small></span><span class="v" id="srcQtr">$0</span></div>
+        <div class="summary-line"><span>Pay in quarterly estimated payments<br><small style="font-size:0.66rem;">One quarter each on Apr 15, Jun 15, Sep 15, 2028 and Jan 15, 2029. Income tax only; IRMAA is paid with Medicare.</small></span><span class="v" id="srcQtr">$0</span></div>
         <p id="srcQtrNote" style="margin:4px 0 0;font-size:0.8rem;"></p>
         <details class="foot-note" style="margin-top:6px;">
           <summary>How this is calculated</summary>
-          <p>This splits the same taxes shown elsewhere on the page, so the rows add up to the total. Ordinary tax is layered through the brackets from the bottom: wages first, then taxable Social Security, interest and ordinary dividends, short-term gains, and the IRA withdrawal / Roth conversion last, so it carries the highest ordinary bracket rate. The standard deduction is applied to the lowest layers first. Qualified dividends and long-term gains are taxed at 0/15/20% on top of ordinary taxable income, and the 3.8% NIIT is shared across dividends and gains in proportion to each. The employer estimate is tax on wages alone with the standard deduction; your actual withholding depends on your W-4, pay frequency, and bonuses.</p>
+          <p>This splits the same taxes shown elsewhere on the page, so the rows add up to the total. Ordinary tax is layered through the brackets from the bottom: wages first, then taxable Social Security, interest and ordinary dividends, short-term gains, and the IRA withdrawal / Roth conversion last, so it carries the highest ordinary bracket rate. The standard deduction is applied to the lowest layers first. Qualified dividends and long-term gains are taxed at 0/15/20% on top of ordinary taxable income, and the 3.8% NIIT is shared across dividends and gains in proportion to each. The employer estimate is tax on wages alone with the standard deduction; your actual withholding depends on your withholding settings in Oracle HR, pay frequency, and bonuses.</p>
         </details>
       </div>
 
@@ -858,20 +858,20 @@ if(autoTheme() === 'dark') document.documentElement.setAttribute('data-theme', '
         </div>
         <table class="irmaa" id="irmaaTable">
           <thead>
-            <tr><th>2025 MAGI</th><th style="text-align:right">Part B / mo</th><th style="text-align:right">Part D sur. / mo</th></tr>
+            <tr><th>2026 MAGI</th><th style="text-align:right">Part B / mo</th><th style="text-align:right">Part D sur. / mo</th></tr>
           </thead>
           <tbody></tbody>
         </table>
         <details class="foot-note" style="margin-top:6px;">
           <summary>How this is calculated</summary>
-          <p>Medicare hasn't published 2028 premiums or tiers yet, so this uses placeholders (2027's raised about 3.5%): standard Part B premium $216.73/month with no IRMAA. Part D surcharge is paid on top of your plan's own premium, direct to Medicare. It's a cliff — one dollar over moves the whole year to the next tier. Uses the 2025 MAGI entered at left.</p>
+          <p>Medicare hasn't published 2028 premiums or tiers yet, so this uses placeholders (2027's raised about 3.5%): standard Part B premium $216.73/month with no IRMAA. Part D surcharge is paid on top of your plan's own premium, direct to Medicare. It's a cliff — one dollar over moves the whole year to the next tier. Uses the 2026 MAGI entered at left.</p>
         </details>
       </div>
 
       <div class="card">
-        <h2>Medicare IRMAA (2029 estimate)</h2>
+        <h2>Medicare IRMAA (2030 estimate)</h2>
         <div class="irmaa-total">
-          <span class="lbl">Estimated extra in 2029, per year</span>
+          <span class="lbl">Estimated extra in 2030, per year</span>
           <span class="val" id="irmaaAnnual2">$0</span>
         </div>
         <table class="irmaa" id="irmaaTable2">
@@ -882,7 +882,7 @@ if(autoTheme() === 'dark') document.documentElement.setAttribute('data-theme', '
         </table>
         <details class="foot-note" style="margin-top:6px;">
           <summary>How this is calculated</summary>
-          <p>IRMAA for 2029 is set by your 2028 MAGI, which here is your total income above (AGI, including the taxable part of Social Security; tax-exempt interest isn't tracked). Medicare hasn't published 2029 thresholds or premiums yet, so this uses the 2026 tier table and premiums as a stand-in. Thresholds are normally indexed upward each year, so the actual tier may be the same or lower. Not included in the 2028 tax totals.</p>
+          <p>IRMAA for 2030 is set by your 2028 MAGI, which here is your total income above (AGI, including the taxable part of Social Security; tax-exempt interest isn't tracked). Medicare hasn't published 2030 thresholds or premiums yet, so this uses the 2028 placeholder tier table and premiums as a stand-in. Thresholds are normally indexed upward each year, so the actual tier may be the same or lower. Not included in the 2028 tax totals.</p>
         </details>
       </div>
 
@@ -1164,7 +1164,7 @@ function calculate(){
     comboTotalEl.style.display = 'none';
   }
 
-  // 2029 IRMAA estimate, driven by this year's MAGI
+  // 2030 IRMAA estimate, driven by this year's MAGI
   renderIrmaaTable('irmaaTable2', totalIncome);
   document.getElementById('irmaaAnnual2').textContent = fmt(irmaaAnnualFor(totalIncome));
 

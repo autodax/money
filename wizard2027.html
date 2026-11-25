@@ -1496,19 +1496,13 @@ const b64u={to:u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharC
   from:t=>{const s=atob(t.replace(/-/g,'+').replace(/_/g,'/'));const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u}};
 const chk=t=>{let h=0x811c9dc5;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0}return h.toString(36)};
 const pipe=async(u,st)=>new Uint8Array(await new Response(new Blob([u]).stream().pipeThrough(st)).arrayBuffer());
-// Short links saved for a few minutes on Nov 12, 2026 (#c=...) left out entries that matched these starting values.
-const OLD_DEF={"bas":"172000","div":"4000","p403":"1500000","r403":"258000","brk":"344000","down":"no","yr":"2027","by":"1966","lw":"2028","lsp":"110000","ssa":"70","ss62":"2316","ss63":"2513","ss64":"2729","ss65":"3008","ss66":"3294","ss67":"3587","ss68":"3692","ss69":"4043","ss70":"4648","model":"target","ttype":"eff","teff":"17","tbrk":"22","tamt":"40000","rtgt":"40000","corder":"small","cmax":"74","pay":"roll","meth":"bt","mix":"90","mean":"6","vol":"14","wrap":"0","inf":"3","bmode":"g","end":"93","tgt":"85","lowP":"72","upP":"95","cush":"300000"};
-const IG={p:'pre',r:'roth',b:'brk',c:'cash'};
-function fatten(x){const o={...OLD_DEF,...x};
-  if(Array.isArray(x.acct))o.acct=JSON.stringify(x.acct.map(r=>({g:IG[r[0]],n:r[1],t:r[3]||'',b:r[2],e:!!r[4]})));
-  return o}
 // The link carries every entry, including blank ones, so it never depends on values written in this file.
 async function packState(o){const j=JSON.stringify(o);
   if(typeof CompressionStream==='undefined')return new URLSearchParams(o).toString();
   return 'z='+b64u.to(await pipe(new TextEncoder().encode(j),new CompressionStream('deflate-raw')))+'.'+chk(j)}
 async function fromHash(){const h=location.hash.slice(1);if(!h||!h.includes('='))return null;
-  if(/^[cz]=/.test(h)){try{const [d,c]=h.slice(2).split('.');const j=new TextDecoder().decode(await pipe(b64u.from(d),new DecompressionStream('deflate-raw')));
-      if(chk(j)!==c)throw 0;const o=JSON.parse(j);return h[0]==='c'?fatten(o):o}catch(e){linkDamaged();return null}}
+  if(/^z=/.test(h)){try{const [d,c]=h.slice(2).split('.');const j=new TextDecoder().decode(await pipe(b64u.from(d),new DecompressionStream('deflate-raw')));
+      if(chk(j)!==c)throw 0;return JSON.parse(j)}catch(e){linkDamaged();return null}}
   const q=new URLSearchParams(h),o={};q.forEach((v,k)=>o[k]=v);return o}
 function linkDamaged(){const d=document.createElement('div');d.style.cssText='margin:10px auto;max-width:900px;padding:10px 14px;border:2px solid var(--owe);border-radius:8px;background:var(--card,#fff)';
   d.innerHTML='<b>This link is damaged</b> (it may have been cut off or changed when it was copied), so I didn\'t load it. The Wizard shows the entries last saved in this browser instead. To fix the link, open the plan on a device where it works and choose <b>Save</b> again.';

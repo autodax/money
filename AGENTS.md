@@ -32,7 +32,7 @@ This is the single source of the working rules; `CLAUDE.md` just points here for
 - Entries are saved in the browser (`rpwState`) and in the link (`#z=...`). Carrying a plan to the next year's
   Wizard clears the year-specific entries listed in the carry-forward code.
 - The Wizard and the Roth planner must reach the same conversion for the same strategy. `tests/compare.js` checks this.
-- `index.html`, `wizard.html`, and `roth.html` just forward to the 2026 versions (`tax2026.html`, `wizard2026.html`, `roth2026.html`).
+- `index.html`, `wizard.html`, `roth.html`, and `spend.html` just forward to the 2026 versions (`tax2026.html`, `wizard2026.html`, `roth2026.html`, `spend2026.html`).
 - Dates: the yearly check-in is Dec 15. Nine-month pay (19.5 pay periods) is built in. The last work year is 2028
   (paychecks end in late May 2028). 2028 tax figures are **placeholders** until the real ones are published.
 

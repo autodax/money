@@ -14,7 +14,7 @@ These notes were started from a quick read of the files; expand them as you work
 - `roth2026.html`, `roth2027.html`, `roth2028.html`: Roth Conversion Planner (same tax engine as the Wizard).
 - `tax2026.html`, `tax2027.html`, `tax2028.html`: Federal Tax Estimator, single filer.
 - `spend2026.html`, `spend2027.html`, `spend2028.html`: "What to Withdraw This Year" calculator.
-- `index.html`, `roth.html`, `wizard.html`: small pages that forward to the 2026 versions (`tax2026.html`, `roth2026.html`, `wizard2026.html`).
+- `index.html`, `roth.html`, `wizard.html`, `spend.html`: small pages that forward to the 2026 versions (`tax2026.html`, `roth2026.html`, `wizard2026.html`, `spend2026.html`).
 
 ## Tests
 
