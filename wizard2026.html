@@ -188,6 +188,7 @@ nav.steps button{padding-top:3px;padding-bottom:9px}
 /* Numbers in Literata: even-height digits of equal width, so columns line up */
 table,.big,.tile .v,.accsum,.wy,.inp td:last-child,input,select{font-family:var(--serif)!important;font-variant-numeric:lining-nums tabular-nums}
 .amt,nav.steps button .n,.todo>li::before{font-variant-numeric:lining-nums tabular-nums}
+@media print{@page{margin:.5in}html,html.safari,html.iphone{zoom:1!important}:root,:root[data-theme="dark"]{--bg:#fff;--card:#fff;--line:#ccc;--ink:#111;--soft:#444;--green:#1f3327;--band:#f4f4f4;--owe:#8c3b2e;--ok:#2f6b45;--brown:#f0ece4;--brown-line:#bbb;--brown-ink:#222;--on-green:#fff;color-scheme:light}body{background:#fff!important;color:#111!important;padding:0!important}body::before,nav.steps,.tools,.btns,.no-save,#introBox,#yrwarn,#phBanner{display:none!important}.wrap{max-width:none}.card{border:1px solid #ccc;border-radius:8px;margin-bottom:14px;overflow:visible!important}.scroll{overflow:visible!important}.todo>li,.tile{break-inside:avoid}table{font-size:.82rem}}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}@media (max-width:600px){body{padding-left:max(4px,env(safe-area-inset-left,0px));padding-right:max(4px,env(safe-area-inset-right,0px))}}
 /* Compact input boxes and tighter spacing on every screen, same text size */
@@ -310,6 +311,12 @@ input:not([type=checkbox]):not([type=radio])[type=date]{padding-top:.12em;paddin
   <div class="group">Property tax</div>
   <div class="grid">
     <div><label for="ptyr">First year I pay my property tax myself</label><input id="ptyr" type="number" inputmode="numeric" step="1" value=""><div class="help">The year my mortgage is paid off and the escrow stops paying it. From that year on, the plan reminds me to pay the property tax in November, when the discount is largest (4%). Leave blank while the mortgage pays it.</div></div>
+  </div>
+  <div class="group">Health insurance before Medicare</div>
+  <div class="grid">
+    <div><label for="him">Monthly health insurance, in today’s $</label><input id="him" type="number" inputmode="decimal" step="0.01" value="813.46"><div class="help">Paid on top of my living expenses (just like Medicare), from the start month below until Medicare begins in November of the year I turn 65. Inflates each year. Set to 0 if not needed.</div></div>
+    <div><label for="hisy">Starts in year</label><input id="hisy" type="number" inputmode="numeric" step="1" value="2028"><div class="help">Calendar year this coverage begins.</div></div>
+    <div><label for="hism">Starts in month</label><select id="hism"><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8" selected>August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select><div class="help">First month paid in that year.</div></div>
   </div>
   <div class="group">Social Security and Medicare</div>
   <div class="grid">
@@ -556,10 +563,12 @@ const fullOf=n=>n<26?Math.floor(n+1e-9):26,nchkOf=n=>n<26?fullOf(n)+(n-fullOf(n)
 const payrollWH=(w,n,r=CUR)=>n>=26||!(w>0)?employerEst(w,r):employerEst(w/n*26,r)/26*n;
 // Take-home pay estimate: wages minus Roth contributions, withholding and Social Security/Medicare tax
 const thpEst=(w,k,inf,n=26)=>{const r=nextRules();return w>0?Math.max(0,w-k-payrollWH(w,n,r||CUR)-ficaOf(w,inf,r)):0};
+const hiMonths=(y,age,sy,sm)=>{if(!(sy>0)||y<sy||age>65)return{mo:0,m0:0,m1:0};const m0=y===sy?Math.min(12,Math.max(1,sm||1)):1,m1=age===65?10:12;return{mo:Math.max(0,m1-m0+1),m0,m1}};
 // This year's spending and where it came from (take-home pay, Social Security, RMD, brokerage)
 function nowCalc(yr,w,wh,ss,rmd,brk,bp,inf){const k=yr<=num('lw')&&WK[yr]?WK[yr][1]:0,fica=w>0?ficaOf(w,0):0,thp=Math.max(0,w-k-wh-fica),spend=num('lsp'),oth=num('oth');
-  const calc=Math.min(brk,Math.max(0,spend-thp-ss-rmd-oth)),typed=!isBlank('bwd'),bwd=typed?num('bwd'):calc;
-  return{spend,thp,w,k,wh,fica,ss,rmd,oth,calc,typed,bwd,gains:bwd*(1-bp),other:Math.max(0,spend-thp-ss-rmd-oth-bwd)}}
+  const him=Math.max(0,num('him')),hiM=him>0?hiMonths(yr,yr-num('by'),num('hisy'),+val('hism')||8):{mo:0,m0:0,m1:0},hi=him*hiM.mo;
+  const calc=Math.min(brk,Math.max(0,spend+hi-thp-ss-rmd-oth)),typed=!isBlank('bwd'),bwd=typed?num('bwd'):calc;
+  return{spend,hi,hiMo:hiM.mo,hiM0:hiM.m0,hiM1:hiM.m1,hiPer:him,thp,w,k,wh,fica,ss,rmd,oth,calc,typed,bwd,gains:bwd*(1-bp),other:Math.max(0,spend+hi-thp-ss-rmd-oth-bwd)}}
 // Full tax breakdown for one year (used for the tax tables in Step 5); the tax itself comes from taxCore
 function taxOf(v){const RR=v.r||CUR,ORD_=RR.ord,QUAL_=RR.qual,w=Math.max(0,v.wages),i=Math.max(0,v.ira),qd=Math.max(0,v.qdiv),st=Math.max(0,v.stcg),lt=Math.max(0,v.ltcg),ss=Math.max(0,v.ss),it=Math.max(0,v.int||0);
   const K=taxCore({wages:w,ira:i,int:it,qdiv:qd,stcg:st,ltcg:lt,ss,o65:v.o65},RR),S=ssTaxable(ss,w+i+it+qd+st+lt),tss=K.tss,ord=K.ord,qual=K.qual,tot=K.tot,ded=K.ded,ordT=K.ordT,left=K.left,qualT=K.qualT;
@@ -633,7 +642,7 @@ function convFor(x,pol,k){const mx=Math.max(0,x.pre-(x.rmdP==null?x.rmd:x.rmdP))
 function prep(I,C0){const s=scenario(I,C0),Wh=I.pay==='qtr'?0:Math.min(s.owed,C0),P=s.P,refill=I.pay==='roll'?Math.min(P,Wh):0;
   let brk=I.brk-P,bas=Math.max(0,I.bas-P*I.bp),cash=I.cash,rest=Math.max(0,s.owed-Wh-(P-refill));
   const cu=Math.min(rest,Math.max(0,cash-I.cashMin));cash-=cu;rest-=cu;const bu=Math.min(rest,brk);brk-=bu;bas=Math.max(0,bas-bu*I.bp);
-  return{s,C0,Y0:I.yr,Y1:I.yr+1,by:I.by,inf:I.inf,lw:I.lw,WK:I.WK,ssA:I.ssA,ssY:I.ssM*12,cmax:I.cmax,cashMin:I.cashMin,
+  return{s,C0,Y0:I.yr,Y1:I.yr+1,by:I.by,inf:I.inf,lw:I.lw,WK:I.WK,ssA:I.ssA,ssY:I.ssM*12,cmax:I.cmax,cashMin:I.cashMin,him:I.him,hisy:I.hisy,hism:I.hism,
     yld:I.brk>0?I.div/I.brk:0,efR:I.ef>0&&!I.intEst?Math.min(.06,I.int/I.ef):.03,
     st:{pre:Math.max(0,I.pre-C0-I.rmdP),roth:I.roth+C0-Wh+refill,brk,bas,cash,ef:I.ef,efp:Math.max(0,I.efp-(I.rmd-I.rmdP))},agiM1:I.lagi>0?I.lagi/(1+I.inf):s.t.tot,agi0:s.t.tot}}
 
@@ -642,7 +651,8 @@ function runYears(P,opt){let{pre,roth,brk,bas,cash,ef}=P.st,efp=P.st.efp||0;cons
   for(let k=0;;k++){const y=P.Y1+k,age=y-P.by;if(age>opt.end)break;
     const r=rulesAt(y,P.Y0,P.inf),d=r.d,wk=y<=P.lw&&P.WK[y]?P.WK[y]:[0,0],w=wk[0]/d,K=wk[1]/d;
     const ss=P.ssA&&age>=P.ssA?P.ssY*(age===P.ssA?1/12:1):0,rmdA=age>=75?(pre+efp)/(DIV[Math.min(age,100)]):0,rmdP=pre+efp>0?rmdA*pre/(pre+efp):0;
-    const mo=age<65?0:age===65?2:12,irmY=mo?irmaaR(agi[k],r)*mo/12:0,med=mo?PARTB*mo+irmY:0;
+    const hiMo=P.him>0?hiMonths(y,age,P.hisy,P.hism).mo:0;
+    const mo=age<65?0:age===65?2:12,irmY=mo?irmaaR(agi[k],r)*mo/12:0,med=(mo?PARTB*mo+irmY:0)+hiMo*(P.him||0);
     const down=k===0?!!opt.down0:(opt.ret?opt.ret(k-1)<-.05:false);
     const x={S:opt.S,med,K,fi:ficaR(w,r),w,ss,rmd:rmdA,rmdP,pre,roth,brk,bas,cash,cashMin:P.cashMin,ef,efp,down,div:brk*P.yld,intr:ef*P.efR,age,r,cmax:P.cmax};
     const C=convFor(x,opt.pol,k),f=yearFlow(x,C),g=opt.ret?opt.ret(k):opt.g;lastR=r;lastOrd=f.res.ordT;
@@ -780,7 +790,7 @@ function inputs(){saveWork();
     NOW:nowCalc(yr,wage(yr),wwhCalc(yr,wage(yr)).v,ssThis,rmd,brk,brk>0?Math.min(num('bas'),brk)/brk:1,inf),lsp:num('lsp'),lspBlank:isBlank('lsp'),thp:isBlank('thp')?thpEst(wage(yr+1),yr+1<=num('lw')&&WK[yr+1]?wkN(yr+1)[1]:0,inf,npayOf()):num('thp')*(1+inf),npay:npayOf(),xname:val('xname').trim(),xdate:(()=>{const p=val('xdate').split('-').map(Number);return p.length===3&&p[0]?new Date(p[0],p[1]-1,p[2]):null})(),xcash:Math.max(0,num('xcash')),xtax:Math.max(0,Math.min(num('xtax'),isBlank('xcash')?num('xtax'):num('xcash'))),thpEst:isBlank('thp'),ltax:num('ltax'),ltaxBlank:isBlank('ltax'),lagi:num('lagi'),agi2:num('agi2'),
     model:val('model'),corder:val('corder'),acc:{p403:num('p403'),p457:num('p457'),pira:num('pira')},accRows:ACC.filter(a=>a.g==='pre'&&!a.e&&+a.b>0).map(a=>({n:a.n||({403:'403(b)',457:'457(b)',ira:'Traditional IRA'})[a.t],c:a.t,b:+a.b,o:a.o})),camt:num('camt'),camtN:isBlank('camtN')?num('camt'):num('camtN'),ttype:val('ttype'),teff:num('teff'),tbrk:+val('tbrk'),tamt:num('tamt'),rtgt:num('rtgt'),cmax:Math.min(100,Math.max(60,num('cmax')||74)),pay:'qtr',tpm:val('tpm')||'qtr',wper:Math.max(0,num('wper')),
     meth:val('meth'),mix:num('mix'),wrap:val('wrap')==='1',M,inf,end:num('end'),tg:num('tgt')/100,lo:num('lowP')/100,up:num('upP')/100,bmode:val('bmode'),setsp:num('setsp')/(1+inf),setspN:num('setsp'),g,cush:num('cush'),
-    WK:Object.fromEntries(Object.keys(WK).map(y=>[y,wkN(+y)])),lw:num('lw'),ptyr:num('ptyr'),T:ssTable()};
+    WK:Object.fromEntries(Object.keys(WK).map(y=>[y,wkN(+y)])),lw:num('lw'),ptyr:num('ptyr'),him:Math.max(0,num('him')),hisy:num('hisy'),hism:+val('hism')||8,T:ssTable()};
   _r.ltg=_r.ltgTyped?num('ltg'):_r.NOW.gains;return _r}
 
 /* ---------- This year's scenario for a given conversion ---------- */
@@ -840,8 +850,9 @@ function compute(){const I=inputs();
   R.nextReq=(S.t.tot>150000?1.1:1)*S.t.tax;R.NR=nextRules();R.nextWH=payrollWH(I.wageNext,I.npay,R.NR||CUR);R.qNext=Math.max(0,R.nextReq-R.nextWH)/4;
   // Medicare in the budget year (Jan–Dec next year): Part B from the month I turn 65; IRMAA uses AGI from two years before that year (= last year's AGI)
   {const ageN=I.yr+1-I.by,mo=ageN<65?0:ageN==65?2:12,f=1+I.inf,ir=irmaa27For(I.lagi),ssN=I.ssA&&ageN>=I.ssA?I.ssM*12*f*(ageN==I.ssA?1/12:1):0;
+   const hi=I.him>0?hiMonths(I.yr+1,ageN,I.hisy,I.hism):{mo:0,m0:0,m1:0};
    // 2027's published premium (209.40) and tiers; no inflation uplift needed since they are official
-   R.med={ageN,mo,partB:209.40*mo,irm:ir.annual*mo/12,tier:ir.tier,ssN,noAgi:!I.lagi};R.med.total=R.med.partB+R.med.irm}
+   R.med={ageN,mo,partB:209.40*mo,irm:ir.annual*mo/12,tier:ir.tier,ssN,noAgi:!I.lagi,hiMo:hi.mo,hiM0:hi.m0,hiM1:hi.m1,hiPer:I.him*f,hi:I.him*hi.mo*f};R.med.total=R.med.partB+R.med.irm+R.med.hi}
   // 5-6. Funding next year's budget and next year's tax, for E dollars of extra paycheck withholding over the year (Step 3).
   // Extra withholding lowers take-home pay by E, so spending draws E more from the other sources (brokerage, normally); whatever tax
   // is left after both regular and extra withholding is paid in quarterly payments, also from brokerage (the "refill" sale).
@@ -902,7 +913,7 @@ function render(R){
   const I=R.I,S=R.S,t=S.t,G=R.G,today=new Date();
   const dt=(y,m,d)=>new Date(y,m,d)<today;
   // Mention Medicare only from the year before it starts (IRMAA has its own reminder from 63), Social Security only from the year before I claim
-  const medTxt=I.age+1>=65,ssTxt=!!I.ssA&&I.age+1>=I.ssA,andMed=medTxt?' and Medicare':'';
+  const medTxt=I.age+1>=65,hiTxt=R.med.hiMo>0,hcTxt=medTxt&&hiTxt?'health insurance and Medicare premiums':medTxt?'Medicare premiums':hiTxt?'health insurance':'',ssTxt=!!I.ssA&&I.age+1>=I.ssA,andMed=hcTxt?' and '+hcTxt:'';
   const P=R.P,H=P.H,lim=P.SA.lim75,canMore=I.age<=I.cmax&&I.pre>0,y75=I.by+75,rk=x=>x>=1?fmt(x):'$0';
   const room=R.C24<=0?`My income is already above the 24% bracket before any conversion, so converting this year (${I.yr}) would be taxed at 32% or more.`:R.C>=R.C24-50?`This plan's ${fmt(R.C)} already reaches the top of the 24% bracket, so converting more this year (${I.yr}) would be taxed at 32% or more.`:`The top of the 24% bracket leaves room for <b>${fmt(R.C24-R.C)}</b> more this year (${I.yr}), ${fmt(R.C24)} in all.`;
   // One answer to "convert more?", based on the long-range check below
@@ -925,12 +936,14 @@ function render(R){
   // First action of next year's check-in: run next year's Wizard (the link carries over this year's entries)
   act(`${lastNov(I.yr+1).s}, ${I.yr+1}`,`Run the ${I.yr+1} <a class="wznext" href="#">Wizard</a>. It opens with this year's entries already filled in${I.yr+2<=I.lw?`; then set ${I.yr+2} payroll Roth contributions`:''}.`);
   {const N=I.NOW;if(!I.lspBlank){const m=Math.max(0,11-today.getMonth()),rows=[['Take-home pay',N.thp],['Social Security',N.ss],['Required minimum distribution',N.rmd],['Other pre-tax withdrawals',N.oth],['Brokerage',N.bwd]].filter(x=>x[1]>0);
-    let li=`<span class="when">Jan–Dec ${I.yr}</span><div>This year's (${I.yr}) spending: about <b class="amt">${fmt(N.spend)}</b>, paid from:</div><ul>`;
+    let li=`<span class="when">Jan–Dec ${I.yr}</span><div>This year's (${I.yr}) spending: about <b class="amt">${fmt(N.spend)}</b>${N.hi>0?`, plus <b class="amt">${fmt(N.hi)}</b> of health insurance (${N.hiMo} months, ${MO[N.hiM0-1]}–${MO[N.hiM1-1]}, ${fmt(N.hiPer)}/mo)`:''}, paid from:</div><ul>`;
     rows.forEach(([k,x])=>{li+=`<li>${k}: ${fmt(x)}${k==='Take-home pay'&&N.w?` (${fmt(N.w)} wages − ${fmt(N.k)} Roth − ${fmt(N.wh)} federal tax − ${fmt(N.fica)} FICA, Social Security and Medicare tax)`:''}${k==='Brokerage'?`${N.typed?' (as entered)':' (what\'s left after the other sources)'}, about ${fmt(N.bwd/12)} a month`:''}</li>`});
     if(N.other>1)li+=`<li class="warn">${fmt(N.other)} isn't covered by these sources${N.typed?'; check the brokerage withdrawals I entered':''}.</li>`;
     li+=`</ul>`;
     if(N.bwd>0)li+=`<p class="note">${I.ltgTyped?`I entered ${fmt(I.ltg)} of long-term gains; the brokerage withdrawals alone would be about ${fmt(N.gains)} at my ${Math.round(I.bp*100)}% basis.`:`About <b>${fmt(N.gains)}</b> of the brokerage withdrawal is long-term gain at my ${Math.round(I.bp*100)}% basis. The tax on that gain is part of this year's (${I.yr}) tax, which the items below pay; this spending amount doesn't include that tax. Type actual gains on Step 2 to use them instead.`}</p>`;
-    if(N.bwd>0&&m>0){li+=`<p class="note">Through December, keep brokerage transfers at about ${fmt(N.bwd/12)} a month.</p>`;act(`Through Dec ${I.yr}`,`Transfer about ${fmt(N.bwd/12)} a month from brokerage to checking.`);for(let mo=0;mo<12;mo++)cal(`${I.yr}-${String(mo+1).padStart(2,'0')}-01`,`${fmt(N.bwd/12)} to checking`,'Monthly transfer from brokerage to checking for spending.')}
+    const hiM=mo=>N.hiMo>0&&mo+1>=N.hiM0&&mo+1<=N.hiM1?N.hiPer:0;
+    if(N.hiMo>0&&N.bwd>0&&m>0&&!N.typed){const needM=Math.max(0,N.spend-N.ss-N.rmd-N.oth-N.thp)/12,T=Array.from({length:12},(_,mo)=>needM+hiM(mo));li+=`<p class="note">Brokerage transfers to checking: ${schedText(T)}.</p>`;act(`Through Dec ${I.yr}`,`Transfer from brokerage to checking: ${schedText(T)}.`);T.forEach((t,mo)=>{if(t>=1)cal(`${I.yr}-${String(mo+1).padStart(2,'0')}-01`,`${fmt(t)} to checking`,'Monthly transfer from brokerage to checking for spending'+(hiM(mo)>0?' and health insurance.':'.'))})}
+    else if(N.bwd>0&&m>0){li+=`<p class="note">Through December, keep brokerage transfers at about ${fmt(N.bwd/12)} a month.</p>`;act(`Through Dec ${I.yr}`,`Transfer about ${fmt(N.bwd/12)} a month from brokerage to checking.`);for(let mo=0;mo<12;mo++)cal(`${I.yr}-${String(mo+1).padStart(2,'0')}-01`,`${fmt(N.bwd/12)} to checking`,'Monthly transfer from brokerage to checking for spending.')}
     if(N.thp>0)li+=`<p class="note">Take-home pay is an estimate that leaves out insurance and other paycheck deductions. My real paychecks will be a bit smaller, so I may need to withdraw a little more from brokerage. If I know my actual withdrawals, type them on Step 2.</p>`;
     todo.push(li)}}
   todo.forEach((x,i)=>{if(!KIND[i])KIND[i]='now'});
@@ -972,7 +985,7 @@ function render(R){
   todo.forEach((x,i)=>{if(!KIND[i])KIND[i]='est'});
   // ---- To-do: next year's spending, monthly transfers, Roth contributions, one-time money, next year's conversion ----
   // Spending
-  if(!G.err){const W=G.W,m=W/12;const setM=G.mode==='set'||G.mode==='setcut',pctS=x=>Math.round(x*100)+'%';let li=`<span class="when">Jan–Dec ${I.yr+1}</span><div>${setM?'<b>Amount I chose to pay myself (Step 4).</b>':'<b>Set by the guardrails.</b>'} Spend up to <b class="amt">${fmt(W)}</b> after tax in ${I.yr+1}, January through December (${fmt(W/(1+I.inf))} in today's dollars). Federal tax${medTxt?' and Medicare premiums are':' is'} not included: tax on wages comes out of my paychecks, and the rest of ${I.yr+1}'s tax (on brokerage gains and the Roth conversion) is under “Planning ${I.yr+1}'s tax now” below.</div><div style="margin-top:6px"><b>Where the money comes from:</b></div><ul>`;
+  if(!G.err){const W=G.W,m=W/12;const setM=G.mode==='set'||G.mode==='setcut',pctS=x=>Math.round(x*100)+'%';let li=`<span class="when">Jan–Dec ${I.yr+1}</span><div>${setM?'<b>Amount I chose to pay myself (Step 4).</b>':'<b>Set by the guardrails.</b>'} Spend up to <b class="amt">${fmt(W)}</b> after tax in ${I.yr+1}, January through December (${fmt(W/(1+I.inf))} in today's dollars). Federal tax${hcTxt?` and ${hcTxt} are`:' is'} not included: tax on wages comes out of my paychecks, and the rest of ${I.yr+1}'s tax (on brokerage gains and the Roth conversion) is under “Planning ${I.yr+1}'s tax now” below.</div><div style="margin-top:6px"><b>Where the money comes from:</b></div><ul>`;
     const nine=I.npay<26&&R.src.some(s=>s[0]==='Take-home pay'),pm=Math.round(I.npay/26*12);
     // Roth contributions from pay next year (Step 2), split evenly between the Roth 403(b) and the Roth 457(b)
     const rk=(I.yr+1<=I.lw&&wkN(I.yr+1))?wkN(I.yr+1)[1]:0,rnc=fullOf(I.npay),rper=Math.ceil(rk/2/rnc);
@@ -990,19 +1003,21 @@ function render(R){
       li+=`<li><b>${hEsc(nm)}</b>${d?` on ${dl}`:''}: <b class="amt">${fmt(I.xcash)}</b> into checking (Step 2)${tx}.</li>`;
       act(d?ds:`Early ${I.yr+1}`,`${hEsc(nm)}, ${fmt(I.xcash)} into checking${I.xtax>0?` (${fmt(I.xtax)} taxable)`:''}.`);
       if(d)cal(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,`${nm} ${fmt(I.xcash)}`,`${fmt(I.xcash)} into checking${I.xtax>0?`; ${fmt(I.xtax)} of it is taxable income for ${I.yr+1}`:''}. It covers spending in place of the monthly transfers that follow until it's used up.`)}
+    const MN=['January','February','March','April','May','June','July','August','September','October','November','December'],hiInMo=m=>R.med.hiMo>0&&m+1>=R.med.hiM0&&m+1<=R.med.hiM1?R.med.hiPer:0,hiPart=R.med.hiMo>0&&R.med.hiMo<12;
     if(R.src.some(s=>s[0]==='Brokerage')){if(nine){// Paid months run from September for pm months; name them in calendar order (January first) for the year's plan
-        const MN=['January','February','March','April','May','June','July','August','September','October','November','December'],paid=m=>((m-8+12)%12)<pm,
+        const paid=m=>((m-8+12)%12)<pm,
           rng=f=>{const o=[];let st=null;for(let m=0;m<=12;m++){const ok=m<12&&f(m);if(ok&&st===null)st=m;if(!ok&&st!==null){o.push(st===m-1?MN[st]:`${MN[st]} through ${MN[m-1]}`);st=null}}return o.join(' and ')},
           payM=rng(paid),sumM=rng(m=>!paid(m));
-        const tk=(R.src.find(s=>s[0]==='Take-home pay')||[0,0])[1],need=(W+R.med.total-R.med.ssN)/12,sum=Math.max(0,need),pay=Math.max(0,need-tk/pm);
-        const T=MN.map((_,m)=>paid(m)?pay:sum),X=xMonths(T,(R.src.find(s=>s[0]==='One-time money (Step 2)')||[0,0])[1],I),note=m=>paid(m)?'Monthly transfer from my accounts to checking for spending, on top of my paychecks.'+(R.E>0?' Larger than usual because extra tax withholding lowers my take-home pay.':''):'Monthly transfer from my accounts to checking for spending; no paychecks (or only a small one) this month.';
-        li+=`<li><b>Monthly transfer</b> from my accounts to checking: about <b class="amt">${fmt(pay)}</b> a month in ${payM}, and <b class="amt">${fmt(sum)}</b> a month in ${sumM}, when little or no pay comes in.${X.txt}${R.E>0?` These transfers are larger than they would be with quarterly payments, because the extra withholding (${fmt(R.E)}) lowers my take-home pay.`:''}</li>`;act(`Jan–Dec ${I.yr+1}`,X.brief?`Spend up to ${fmt(W)}. Transfer from my accounts to checking: ${schedText(X.T)}.`:`Spend up to ${fmt(W)}. Transfer about ${fmt(pay)} a month from my accounts to checking in ${payM}, and ${fmt(sum)} a month in ${sumM}.`);X.T.forEach((t,mo)=>{if(t>=1)cal(`${I.yr+1}-${String(mo+1).padStart(2,'0')}-01`,`${fmt(t)} to checking`,note(mo)+(t<T[mo]-.5?' Smaller this month because the one-time money covers part of this month\'s spending.':''))})}
-      else{const T=Array(12).fill(R.draw/12),X=xMonths(T,(R.src.find(s=>s[0]==='One-time money (Step 2)')||[0,0])[1],I);li+=`<li><b>Monthly transfer</b> from brokerage to checking: about <b class="amt">${fmt(R.draw/12)}</b> a month.${X.txt}${R.E>0?` This is larger than it would be with quarterly payments, because the extra withholding (${fmt(R.E)}) lowers my take-home pay.`:''}</li>`;act(`Jan–Dec ${I.yr+1}`,X.brief?`Spend up to ${fmt(W)}. Transfer from brokerage to checking: ${schedText(X.T)}.`:`Spend up to ${fmt(W)}. Transfer about ${fmt(R.draw/12)} a month from brokerage to checking.`);X.T.forEach((t,mo)=>{if(t>=1)cal(`${I.yr+1}-${String(mo+1).padStart(2,'0')}-01`,`${fmt(t)} to checking`,'Monthly transfer from brokerage to checking for spending.'+(R.E>0?' Larger than usual because extra tax withholding lowers my take-home pay.':'')+(t<T[mo]-.5?' Smaller this month because the one-time money covers part of this month\'s spending.':''))})}}
+        const tk=(R.src.find(s=>s[0]==='Take-home pay')||[0,0])[1],need=(W+R.med.total-R.med.hi-R.med.ssN)/12,sum=Math.max(0,need),pay=Math.max(0,need-tk/pm);
+        const T=MN.map((_,m)=>(paid(m)?pay:sum)+hiInMo(m)),X=xMonths(T,(R.src.find(s=>s[0]==='One-time money (Step 2)')||[0,0])[1],I),note=m=>(paid(m)?'Monthly transfer from my accounts to checking for spending, on top of my paychecks.':'Monthly transfer from my accounts to checking for spending; no paychecks (or only a small one) this month.')+(hiInMo(m)>0?' Includes health insurance.':'')+(R.E>0?' Larger than usual because extra tax withholding lowers my take-home pay.':'');
+        li+=hiPart?`<li><b>Monthly transfer</b> from my accounts to checking: ${schedText(X.T)}.${X.txt}${R.E>0?` These transfers are larger than they would be with quarterly payments, because the extra withholding (${fmt(R.E)}) lowers my take-home pay.`:''}</li>`:`<li><b>Monthly transfer</b> from my accounts to checking: about <b class="amt">${fmt(pay)}</b> a month in ${payM}, and <b class="amt">${fmt(sum)}</b> a month in ${sumM}, when little or no pay comes in.${X.txt}${R.E>0?` These transfers are larger than they would be with quarterly payments, because the extra withholding (${fmt(R.E)}) lowers my take-home pay.`:''}</li>`;act(`Jan–Dec ${I.yr+1}`,X.brief||hiPart?`Spend up to ${fmt(W)}. Transfer from my accounts to checking: ${schedText(X.T)}.`:`Spend up to ${fmt(W)}. Transfer about ${fmt(pay)} a month from my accounts to checking in ${payM}, and ${fmt(sum)} a month in ${sumM}.`);X.T.forEach((t,mo)=>{if(t>=1)cal(`${I.yr+1}-${String(mo+1).padStart(2,'0')}-01`,`${fmt(t)} to checking`,note(mo)+(t<T[mo]-.5?' Smaller this month because the one-time money covers part of this month\'s spending.':''))})}
+      else{const baseM=Math.max(0,R.draw-R.med.hi)/12,T=MN.map((_,m)=>baseM+hiInMo(m)),X=xMonths(T,(R.src.find(s=>s[0]==='One-time money (Step 2)')||[0,0])[1],I);li+=hiPart?`<li><b>Monthly transfer</b> from brokerage to checking: ${schedText(X.T)}.${X.txt}${R.E>0?` This is larger than it would be with quarterly payments, because the extra withholding (${fmt(R.E)}) lowers my take-home pay.`:''}</li>`:`<li><b>Monthly transfer</b> from brokerage to checking: about <b class="amt">${fmt(R.draw/12)}</b> a month.${X.txt}${R.E>0?` This is larger than it would be with quarterly payments, because the extra withholding (${fmt(R.E)}) lowers my take-home pay.`:''}</li>`;act(`Jan–Dec ${I.yr+1}`,X.brief||hiPart?`Spend up to ${fmt(W)}. Transfer from brokerage to checking: ${schedText(X.T)}.`:`Spend up to ${fmt(W)}. Transfer about ${fmt(R.draw/12)} a month from brokerage to checking.`);X.T.forEach((t,mo)=>{if(t>=1)cal(`${I.yr+1}-${String(mo+1).padStart(2,'0')}-01`,`${fmt(t)} to checking`,'Monthly transfer from brokerage to checking for spending.'+(hiInMo(mo)>0?' Includes health insurance.':'')+(R.E>0?' Larger than usual because extra tax withholding lowers my take-home pay.':'')+(t<T[mo]-.5?' Smaller this month because the one-time money covers part of this month\'s spending.':''))})}}
     else act(`Jan–Dec ${I.yr+1}`,`Spend up to ${fmt(W)}.`);
     if(R.viaConv>0)li+=`<li>Brokerage runs short: fund ${fmt(R.viaConv)} by converting that amount (and paying its tax with estimated payments) and taking it from the Roth. Never take a direct IRA distribution.</li>`;
-    {const M=R.med,Y=I.yr+1;if(M.mo>0){const parts=`${fmt(M.partB)} Part B${M.irm>0?` + ${fmt(M.irm)} IRMAA surcharge`:''}`;
-      li+=M.ssN>=M.total?`<li>Medicare: ${fmt(M.total)} for ${Y} (${parts}) is deducted from my Social Security, so deposits will be about ${fmt(M.ssN-M.total)} instead of ${fmt(M.ssN)}. Medicare is paid on top of my spending budget.</li>`
-        :`<li>Medicare: ${fmt(M.total)} for ${Y} (${parts}${M.mo<12?`, ${M.mo} months starting November`:''}) is paid on top of my spending budget, by bill or automatic payment${M.ssN>0?' until Social Security starts':''}. My Social Security doesn't start until ${I.by+I.ssA}.</li>`;
+    {const M=R.med,Y=I.yr+1,mTot=M.partB+M.irm;if(M.hiMo>0){const hiSpan=M.hiM0===1&&M.hiM1===12?'all year':`${MN[M.hiM0-1]} through ${MN[M.hiM1-1]} (${M.hiMo} months)`;li+=`<li><b>Health insurance</b> (${hiSpan}): <b class="amt">${fmt(M.hi)}</b> (${fmt(M.hiPer)}/mo), paid on top of my spending budget until Medicare starts in November ${I.by+65}.</li>`}
+      if(M.mo>0){const parts=`${fmt(M.partB)} Part B${M.irm>0?` + ${fmt(M.irm)} IRMAA surcharge`:''}`;
+      li+=M.ssN>=mTot?`<li>Medicare: ${fmt(mTot)} for ${Y} (${parts}) is deducted from my Social Security, so deposits will be about ${fmt(M.ssN-mTot)} instead of ${fmt(M.ssN)}. Medicare is paid on top of my spending budget.</li>`
+        :`<li>Medicare: ${fmt(mTot)} for ${Y} (${parts}${M.mo<12?`, ${M.mo} months starting November`:''}) is paid on top of my spending budget, by bill or automatic payment${M.ssN>0?' until Social Security starts':''}. My Social Security doesn't start until ${I.by+I.ssA}.</li>`;
       if(M.noAgi)li+=`<li class="warn">Enter last year's (${I.yr-1}) AGI on Step 2 to include any IRMAA surcharge.</li>`}}
     if(R.unfunded>1)li+=`<li class="warn">${fmt(R.unfunded)} can't be funded from my accounts.</li>`;
     const how=setM?`<p class="note" style="color:var(--ink)"><b>How this amount is chosen:</b> I set it on Step 4 under <b>Next year's budget → An amount I choose</b> (${fmt(I.setspN)} for ${I.yr+1}${G.mode==='setcut'?`, then cut by the guardrails because that amount fell below my ${pctS(I.lo)} chance`:''}).${G.mode==='setcut'?'':' This amount is <b>not</b> the most I could spend.'} For the most I can spend safely${G.mode==='setcut'?' at my target chance':''}, choose <b>Set by the guardrails</b> there instead and leave this year's spending blank on Step 2: the budget becomes the most that lasts to ${I.end} in ${pctS(I.tg)} of the market histories tested, about <b>${fmt(G.Wtg)}</b> in ${I.yr+1}.</p>`
@@ -1193,7 +1208,7 @@ function render(R){
   <p class="note">Uses 2026 brackets, standard deduction${I.o65?' with the age-65 and temporary senior deductions':''}${ssTxt?', Social Security taxation':''} and the 3.8% net investment income tax, the same rules as the Federal Tax Estimator. All dividends are treated as qualified.</p>`;
 
   // Links to the apps
-  const PCT=new Set(['inf','infl','g','gb','basis','solveBasis','tgt','lowP','upP','mean','vol','tval']);
+  const PCT=new Set(['inf','infl','g','gb','basis','solveBasis','tgt','lowP','upP','mean','vol','tval','him']);
   const clean=(k,v)=>{const n=typeof v==='number'?v:(typeof v==='string'&&v.trim()!==''&&isFinite(+v)?+v:null);if(n===null)return v;return String(PCT.has(k)?Math.round(n*100)/100:Math.round(n))};
   const q=o=>Object.entries(o).filter(([k,v])=>v!==''&&v!=null).map(([k,v])=>k+'='+encodeURIComponent(clean(k,v))).join('&');
   const taxL='https://autodax.github.io/money/tax2026.html#'+q({wages:Math.round(t.w),wrate:Math.ceil(I.wwh+(I.pay==='wh'?R.Wh||0:0)),wtype:'amt',ira:Math.round(t.i),ssa:Math.round(t.ss),ndiv:Math.round(t.it),qdiv:Math.round(t.qd),stcg:Math.round(t.st),ltcgPlan:Math.round(I.ltg),ltcg:Math.ceil(S.g),magi2yr:I.o65?Math.round(I.agi2||0):0,age:I.o65?'over65':'under65',solveBasis:I.bp*100,bracketSel:I.tbrk,rateSel:Math.min(22,Math.max(15,Math.round(I.teff)))});
@@ -1202,7 +1217,7 @@ function render(R){
   if(I.meth==='bt')Object.assign(sp,{method:'bt',mix:mx,wrap:I.wrap?1:0});else if(I.meth==='cus'||I.mix%10)Object.assign(sp,{method:'mc',mix:'custom',src:'van',mean:I.M.mean,vol:I.M.vol});else Object.assign(sp,{method:'mc',mix:I.mix,src:I.meth});
   if(ssAmts!==DEFAMT.join(','))sp.ssAmts=ssAmts;
   const spendL='https://autodax.github.io/money/spend2026.html#'+q(sp);
-  const rp={living:Math.round(P.living),infl:I.inf*100,g:I.g*100,p403:Math.round(num('p403')+num('efp'))||'',p457:Math.round(num('p457'))||'',pira:Math.round(num('pira'))||'',r403:Math.round(num('r403'))||'',r457:Math.round(num('r457'))||'',rira:Math.round(num('rira'))||'',brk:Math.round(I.brk),bas:Math.round(I.bas),div:Math.round(I.div),gb:I.g*100,cash:Math.round(I.cash)||'',cashmin:Math.round(I.cashMin)||'',ef:Math.round(I.ef)||'',efr:I.ef>0?+(I.int/I.ef*100).toFixed(2):'',corder:I.corder==='custom'?((convSort(I.accRows.map(a=>({...a})),'custom')[0]||{}).c||'small'):I.corder,start:I.yr,by:I.by,lw:I.lw,firstc:I.yr,lastc:I.by+I.cmax};
+  const rp={living:Math.round(P.living),infl:I.inf*100,g:I.g*100,p403:Math.round(num('p403')+num('efp'))||'',p457:Math.round(num('p457'))||'',pira:Math.round(num('pira'))||'',r403:Math.round(num('r403'))||'',r457:Math.round(num('r457'))||'',rira:Math.round(num('rira'))||'',brk:Math.round(I.brk),bas:Math.round(I.bas),div:Math.round(I.div),gb:I.g*100,cash:Math.round(I.cash)||'',cashmin:Math.round(I.cashMin)||'',ef:Math.round(I.ef)||'',efr:I.ef>0?+(I.int/I.ef*100).toFixed(2):'',him:I.him||'',hisy:I.him>0?I.hisy:'',hism:I.him>0?I.hism:'',corder:I.corder==='custom'?((convSort(I.accRows.map(a=>({...a})),'custom')[0]||{}).c||'small'):I.corder,start:I.yr,by:I.by,lw:I.lw,firstc:I.yr,lastc:I.by+I.cmax};
   for(let y=I.yr;y<=I.lw;y++)if(I.WK[y]){rp['w'+y+'a']=I.WK[y][0]||'';rp['w'+y+'b']=I.WK[y][1]||''}
   // The planner runs the same method I picked here, with the same market futures for Auto with guardrails
   const tt=I.model==='target'?I.ttype:I.model;
@@ -1212,7 +1227,7 @@ function render(R){
     wz:(()=>{const r=x=>Math.round(x*100)/100,S=P=>{const st={};for(const k in P.st)st[k]=r(P.st[k]);return{st,agi0:r(P.agi0)}},P0=prep(I,0),alt={};
       // each strategy's own starting point when this year's conversion differs (and the chosen plan's)
       if(R.P&&R.P.C0>0)alt.plan=S(prep(I,R.P.C0));(R.P&&R.P.cands||[]).forEach(c=>{if(c.C0>0)alt[c.k+':'+c.v]=S(prep(I,c.C0))});
-      return JSON.stringify({Y0:P0.Y0,Y1:P0.Y1,ssY:r(P0.ssY),cashMin:r(P0.cashMin),yld:+P0.yld.toFixed(6),efR:+P0.efR.toFixed(6),...S(P0),agiM1:r(P0.agiM1),alt})})()});
+      return JSON.stringify({Y0:P0.Y0,Y1:P0.Y1,ssY:r(P0.ssY),cashMin:r(P0.cashMin),him:r(P0.him||0),hisy:P0.hisy||0,hism:P0.hism||8,yld:+P0.yld.toFixed(6),efR:+P0.efR.toFixed(6),...S(P0),agiM1:r(P0.agiM1),alt})})()});
   const rothL=`https://autodax.github.io/money/roth${FILEYEAR}.html#`+q(rp);
   const links=`<div class="links"><a href="${spendL}" target="_blank" rel="noopener">What to Withdraw This Year<span>Same balance, guardrails and returns</span></a><a href="${rothL}" target="_blank" rel="noopener">Roth Conversion Planner<span>Same accounts, wages and strategy</span></a><a href="${taxL}" target="_blank" rel="noopener">2026 Federal Tax Estimator<span>This year's (${I.yr}) income, conversion and withholding</span></a><a href="${taxNext().url}" target="_blank" rel="noopener">${taxNext().yr} Federal Tax Estimator<span>Next year's (${I.yr+1}) estimate${taxNext().yr!=String(I.yr+1)?`, on ${taxNext().yr} rules`:''}</span></a></div>
   ${ssTxt||R.mixNote?`<p class="note">${ssTxt?'The Roth Conversion Planner uses its own built-in Social Security amounts. ':''}${R.mixNote||''}</p>`:''}`;
@@ -1227,7 +1242,7 @@ function render(R){
     const D={ntax:nx?[`${I.yr+1} tax details`,nx]:null,now:moneyOrder?['Where each year\'s money comes from',moneyOrder.replace(/^<div class="sub"><h4>[^<]*<\/h4>/,'').replace(/<\/div>$/,'')]:null,conv:['Conversion details and long-range check',conv],est:[`${I.yr} tax details`,tax],next:[`How the ${I.yr+1} budget is set`,spend]}[KIND[i]];
     return `<li><div>${x}${D&&D[1]?`<details class="deep"><summary>${D[0]}</summary><div class="deepin">${D[1]}</div></details>`:''}</div></li>`}).join('')}</ol></div>
   <div class="card span"><h2>Cross-checking in my apps</h2>${links}</div>
-  <div class="card span no-save"><h2>Keep a record</h2><p class="note" style="margin-top:0">Saves a dated copy of this plan, with everything I entered and a link to reopen it, as one HTML file to keep with this year's tools.</p><div class="btns" style="justify-content:flex-start"><button class="btn" type="button" id="saveplan">Save this year's plan</button></div><p class="note" id="saveplanmsg"></p><p class="note" style="margin-top:14px">Next fall, start next year's plan from this year's plan. The button opens next year's Wizard with everything I entered here and outlines what to update.</p><div class="btns" style="justify-content:flex-start"><button class="btn ghost" type="button" id="nextbtn">Start my ${I.yr+1} plan</button></div><p class="note" id="nextmsg"></p></div>
+  <div class="card span no-save"><h2>Keep a record</h2><p class="note" style="margin-top:0">Saves a dated copy of this plan, with everything I entered and a link to reopen it, as one HTML file to keep with this year's tools.</p><div class="btns" style="justify-content:flex-start"><button class="btn" type="button" id="saveplan">Save this year's plan</button><button class="btn ghost" type="button" onclick="window.print()">Print / Save PDF</button></div><p class="note" id="saveplanmsg"></p><p class="note" style="margin-top:14px">Next fall, start next year's plan from this year's plan. The button opens next year's Wizard with everything I entered here and outlines what to update.</p><div class="btns" style="justify-content:flex-start"><button class="btn ghost" type="button" id="nextbtn">Start my ${I.yr+1} plan</button></div><p class="note" id="nextmsg"></p></div>
   <div class="card span"><h2>My rules</h2><ul class="rules">
     <li><b>Planning.</b> I decide year by year. Long projections give false precision.</li>
     <li><b>Paying for living costs.</b> I live off salary and brokerage while they last.</li>

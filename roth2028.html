@@ -163,7 +163,7 @@ If none is true, stay with the baseline. If less than about $10k of room is left
 <li>Dividends are qualified, reinvested and taxed each year; the growth rate is total return. RMDs use the IRS Uniform Lifetime Table. Same rules as the tax estimator. Medicare Part B premiums and IRMAA are paid on top of spending and are not deducted for tax. IRMAA uses AGI from two years earlier, so the planner skips it for any year whose AGI two years back is before your start year.</li></ul></details></div>
 </div>
 <script>
-const IN=[['living',"After-tax spending / yr (start-year $; Medicare premiums are paid on top)",120000,500],['infl','Inflation %',2.5,.1],['g','Pre-tax / Roth growth %',8,.1],['p403','403(b) pre-tax at start',0,5000],['p457','457(b) pre-tax at start',0,5000],['pira','Traditional IRA at start',0,5000],['r403','Roth 403(b) at start',0,500],['r457','Roth 457(b) at start',0,500],['rira','Roth IRA at start',0,500],['brk','Brokerage balance at start',0,5000],['bas','Brokerage cost basis, total ($)',0,1000],['div','Brokerage dividends / yr (on starting balance)',0,100],['gb','Brokerage growth %',8,.1],['cash','Cash / checking balance at start',0,500],['cashmin','Cash I always keep (not spent)',0,500],['ef','Emergency fund at start (spent only after a market drop, so not in this steady-growth plan)',0,500],['efr','Emergency fund interest % (blank = 3%)',3,.1],['start','Start year (balances as of Jan 1)',2028,1],['by','Birth year (Nov birthday)',1966,1],['lw','Last working year',2028,1],['firstc','First conversion year',2028,1],['lastc','Last conversion year (not used in convert-fully mode)',2035,1]];
+const IN=[['living',"After-tax spending / yr (start-year $; Medicare premiums are paid on top)",120000,500],['infl','Inflation %',2.5,.1],['g','Pre-tax / Roth growth %',8,.1],['p403','403(b) pre-tax at start',0,5000],['p457','457(b) pre-tax at start',0,5000],['pira','Traditional IRA at start',0,5000],['r403','Roth 403(b) at start',0,500],['r457','Roth 457(b) at start',0,500],['rira','Roth IRA at start',0,500],['brk','Brokerage balance at start',0,5000],['bas','Brokerage cost basis, total ($)',0,1000],['div','Brokerage dividends / yr (on starting balance)',0,100],['gb','Brokerage growth %',8,.1],['cash','Cash / checking balance at start',0,500],['cashmin','Cash I always keep (not spent)',0,500],['ef','Emergency fund at start (spent only after a market drop, so not in this steady-growth plan)',0,500],['efr','Emergency fund interest % (blank = 3%)',3,.1],['him','Monthly health insurance before Medicare (start-year $; paid on top)',0,10],['hisy','Health insurance start year',2028,1],['hism','Health insurance start month (1–12)',8,1],['start','Start year (balances as of Jan 1)',2028,1],['by','Birth year (Nov birthday)',1966,1],['lw','Last working year',2028,1],['firstc','First conversion year',2028,1],['lastc','Last conversion year (not used in convert-fully mode)',2035,1]];
 const WK={};
 function saveWork(){document.querySelectorAll('#work input').forEach(e=>{const y=+e.dataset.y;(WK[y]=WK[y]||[0,0])[+e.dataset.k]=+e.value||0})}
 function renderWork(){saveWork();const g=id=>+document.getElementById(id).value||0,s=g('start'),l=Math.min(g('lw'),s+30);let h='';
@@ -259,11 +259,13 @@ function convFor(x,pol,k){const mx=Math.max(0,x.pre-(x.rmdP==null?x.rmd:x.rmdP))
   const cp=x.agicap>0&&x.age>=63?x.agicap:0;if(cp){const o=ok;ok=C=>o(C)&&yearFlow(x,C).res.tot<cp}
   if(hiC<=0||!ok(0))return 0;if(ok(hiC))return hiC;let lo=0,hi=hiC;for(let n=0;n<22;n++){const m=(lo+hi)/2;ok(m)?lo=m:hi=m}return lo}
 /* Run the years from the start year on. opt: S (after-tax spending, today's $), pol, g and gb (real growth: 403(b)/Roth and brokerage), end (age), stop, rec */
+const hiMonths=(y,age,sy,sm)=>{if(!(sy>0)||y<sy||age>65)return{mo:0,m0:0,m1:0};const m0=y===sy?Math.min(12,Math.max(1,sm||1)):1,m1=age===65?10:12;return{mo:Math.max(0,m1-m0+1),m0,m1}};
 function runYears(P,opt){let{pre,roth,brk,bas,cash,ef}=P.st,efp=P.st.efp||0;const agi=[P.agiM1,P.agi0],rows=[];let lastR=null,lastOrd=0,short=false,shortAge=0,tax=0,irm=0,imb=0,a95=null,dep=0,rmd75=null;
   for(let k=0;;k++){const y=P.Y1+k,age=y-P.by;if(age>opt.end)break;
     const r=rulesAt(y,P.Y0,P.inf),d=r.d,wk=y<=P.lw&&P.WK[y]?P.WK[y]:[0,0],w=wk[0]/d,K=wk[1]/d;
     const ss=P.ssA&&age>=P.ssA?P.ssY*(age===P.ssA?1/12:1):0,rmdA=age>=75?(pre+efp)/(DIV[Math.min(age,100)]):0,rmdP=pre+efp>0?rmdA*pre/(pre+efp):0;
-    const mo=age<65?0:age===65?2:12,irmY=mo?irmaaR(agi[k],r)*mo/12:0,med=mo?PARTB*mo+irmY:0;
+    const hiMo=P.him>0?hiMonths(y,age,P.hisy,P.hism).mo:0;
+    const mo=age<65?0:age===65?2:12,irmY=mo?irmaaR(agi[k],r)*mo/12:0,med=(mo?PARTB*mo+irmY:0)+hiMo*(P.him||0);
     const down=k===0?!!opt.down0:(opt.ret?opt.ret(k-1)<-.05:false),g=opt.ret?opt.ret(k):opt.g,gb=opt.ret?opt.ret(k):(opt.gb!=null?opt.gb:opt.g);
     const x={S:opt.S,med,K,fi:ficaR(w,r),w,ss,rmd:rmdA,rmdP,pre,roth,brk,bas,cash,cashMin:P.cashMin,ef,efp,down,div:brk*P.yld,intr:ef*P.efR,age,y,r,cmax:P.cmax,c0:P.c0,c1:P.c1,agicap:P.agicap};
     const C=convFor(x,opt.pol,k),f=yearFlow(x,C);lastR=r;lastOrd=f.res.ordT;
@@ -321,7 +323,7 @@ function run(){syncInputs();
   const G={g:(1+v('g')/100)/(1+inf)-1,gb:(1+v('gb')/100)/(1+inf)-1},G2={g:(1+v('g')/100+.02)/(1+inf)-1,gb:(1+v('gb')/100+.02)/(1+inf)-1};
   const ssA=+v('ssclaim')||70,brk=v('brk'),efr=document.getElementById('efr').value===''?.03:v('efr')/100;
   let WZ=null;try{WZ=JSON.parse(document.getElementById('wz').value||'null')}catch(e){WZ=null}
-  const base0={Y0:start,Y1:start,by,inf,lw:v('lw'),WK,ssA,ssY:SSTBL[ssA]*12,cmax,cashMin:Math.min(v('cash'),v('cashmin')),yld:brk>0?v('div')/brk:0,efR:efr,
+  const base0={Y0:start,Y1:start,by,inf,lw:v('lw'),WK,ssA,ssY:SSTBL[ssA]*12,cmax,cashMin:Math.min(v('cash'),v('cashmin')),yld:brk>0?v('div')/brk:0,efR:efr,him:v('him'),hisy:v('hisy'),hism:v('hism')||8,
     st:{pre:v('p403')+v('p457')+v('pira'),roth:v('r403')+v('r457')+v('rira'),brk,bas:Math.min(v('bas'),brk),cash:v('cash'),ef:v('ef')},agiM1:undefined,agi0:undefined,c0:v('firstc'),c1:v('lastc'),agicap:v('agicap')};
   // Opened from the Wizard: start where its long-range check starts (January next year, after this year's plan), in this year's dollars
   const base=WZ?{...base0,...WZ,alt:undefined,c0:WZ.Y1,c1:by+cmax,agicap:base0.agicap}:base0,ALT=WZ&&WZ.alt||{};
