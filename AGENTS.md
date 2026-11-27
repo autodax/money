@@ -15,6 +15,7 @@ This is the single source of the working rules; `CLAUDE.md` just points here for
 - When a choice is visual (icons, layouts, colors), show a few options side by side before committing to one.
 - Do the work, test it, push it, then say briefly what changed. Tell him what to do to see it:
   Mac: "reload the page". iPhone: "swipe the app away and reopen it".
+- **Wizard update icon:** Every Wizard has a solid theme-matched icon right after the year pill (`WIZ_ICON` in `wizardYYYY.html`). Whenever you push an update to the Wizard, advance `WIZ_ICON` to the next icon in the cycle (`hat` → `wand` → `orb` → `book` → `owl` → `celestial` → `potion` → `staff` → `hat`, i.e., Wizard Hat, Magic Wand, Crystal Ball, Spellbook, Owl, Moon & Star, Potion Flask, Wizard Staff) across all updated Wizard files, and tell Steve which icon was just pushed so he can tell at a glance that the new version loaded.
 - Before pushing: `git fetch` and rebase onto `origin/main` (other assistants push here too). Commit messages in plain
   language, describing what changed for him.
 - Update `notes/retirement.md` and, if the rules or tests change, this file and `tests/`, in the same commit whenever behavior, a decision or a quirk changes. Record only
