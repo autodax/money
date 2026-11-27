@@ -251,7 +251,7 @@ input:not([type=checkbox]):not([type=radio])[type=date]{padding-top:.12em;paddin
     <div><label for="mkt0">Market value a year ago (optional)</label><input id="mkt0" type="number" inputmode="decimal" step="any" value=""><div class="help">My main stock fund's price on this date last year (<span class="y" data-o="-1"></span>), or the S&amp;P 500 level. Any measure works if both boxes use the same one. S&amp;P 500 closes for every day of the past year: <a href="https://finance.yahoo.com/quote/%5EGSPC/history/" target="_blank" rel="noopener">Yahoo Finance</a> or <a href="https://fred.stlouisfed.org/series/SP500" target="_blank" rel="noopener">FRED</a>. On a weekend or holiday, use the last trading day before it. Dividends aren't counted, which makes a drop look slightly bigger.</div></div>
     <div><label for="mkt1">Market value now (optional)</label><input id="mkt1" type="number" inputmode="decimal" step="any" value=""><div class="help" id="mktHint">If I fill in both, the next question is answered automatically.</div></div>
   </div>
-  <details id="fredBox" open style="margin-top:8px"><summary>S&amp;P 500 chart (FRED). Hover or tap the line to read a day's close.</summary>
+  <details id="fredBox" style="margin-top:8px"><summary>S&amp;P 500 chart (FRED). Hover or tap the line to read a day's close.</summary>
     <div id="fredWrap" style="width:100%;max-width:670px"></div>
   </details>
   <div class="grid" style="margin-top:10px">
